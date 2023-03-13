@@ -1,3 +1,10 @@
+use dotenvy::dotenv;
+use rust_rest::core::config::AppConfig;
+use std::sync::Arc;
+
 fn main() {
-    println!("Hello, world!");
+    dotenv().ok();
+    let config = Arc::new(AppConfig::new());
+
+    println!("Hello, world! {:?}", &config.port);
 }
