@@ -2,7 +2,9 @@ use std::sync::Arc;
 
 use clap::Parser;
 use dotenvy::dotenv;
-use rust_rest::{config::AppConfig, utils::connection_pool::ConnectionManager};
+use rust_rest::{
+    config::AppConfig, services::ServiceRegister, utils::connection_pool::ConnectionManager,
+};
 use tracing::info;
 
 #[tokio::main]
@@ -14,6 +16,8 @@ async fn main() -> anyhow::Result<()> {
     let pg_pool = ConnectionManager::new_pool(&config.database_url, config.run_migrations)
         .await
         .expect("could not initialize the database connection pool");
+
+    let service_register = ServiceRegister::new(pg_pool, config.clone());
 
     println!("Hello, world! {:?}", &config.port);
 

@@ -21,17 +21,17 @@ pub trait ArgonService {
     ) -> CustomResult<bool>;
 }
 
-pub struct ArgonArgonService {
+pub struct ArgonSecurityService {
     config: Arc<AppConfig>,
 }
 
-impl ArgonArgonService {
+impl ArgonSecurityService {
     pub fn new(config: Arc<AppConfig>) -> Self {
         Self { config }
     }
 }
 
-impl ArgonService for ArgonArgonService {
+impl ArgonService for ArgonSecurityService {
     fn hash_password(&self, raw_password: &str) -> CustomResult<String> {
         let password_bytes = raw_password.as_bytes();
         let hashed_password = argon2::hash_encoded(
