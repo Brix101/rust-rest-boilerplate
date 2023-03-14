@@ -8,4 +8,10 @@ pub struct AppConfig {
 
     #[clap(long, env)]
     pub run_migrations: bool,
+
+    #[clap(long, env)]
+    pub argon_salt: String,
+
+    #[clap(long, env)]
+    pub token_secret: String,
 }
