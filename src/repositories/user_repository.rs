@@ -6,6 +6,8 @@ use async_trait::async_trait;
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 
+use crate::dto::user_dto::{ResponseUserDto, UserProfileDto};
+
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynUsersRepository = Arc<dyn UsersRepository + Send + Sync>;
 
@@ -43,6 +45,28 @@ pub struct UserEntity {
     pub password: String,
     pub bio: String,
     pub image: String,
+}
+
+impl UserEntity {
+    pub fn into_dto(self, token: String) -> ResponseUserDto {
+        ResponseUserDto {
+            id: self.id,
+            email: self.email,
+            name: self.name,
+            bio: Some(self.bio),
+            image: Some(self.image),
+            token,
+        }
+    }
+
+    pub fn into_profile(self, following: bool) -> UserProfileDto {
+        UserProfileDto {
+            name: self.name,
+            bio: self.bio,
+            image: self.image,
+            following,
+        }
+    }
 }
 
 impl Default for UserEntity {

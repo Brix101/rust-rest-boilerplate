@@ -2,7 +2,7 @@
 
 // use tracing::info;
 
-// pub mod user_services;
+pub mod user_services;
 
 // #[derive(Clone)]
 // pub struct ServiceRegister {
