@@ -26,7 +26,5 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("could not initialize application routes")?;
 
-    println!("Hello, world! {:?}", &config.port);
-
     Ok(())
 }

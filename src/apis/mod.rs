@@ -16,6 +16,7 @@ use tower::ServiceBuilder;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info;
 
+use crate::apis::user_endpoints::UsersRouter;
 use crate::{dto::PingResponse, services::ServiceRegister};
 
 lazy_static! {
@@ -23,6 +24,8 @@ lazy_static! {
     static ref EXPONENTIAL_SECONDS: &'static [f64] =
         &[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0,];
 }
+
+pub mod user_endpoints;
 
 pub struct ApplicationController;
 
@@ -40,9 +43,12 @@ impl ApplicationController {
             .context("could not setup buckets for metrics, verify matchers are correct")?
             .install_recorder()
             .context("could not install metrics recorder")?;
-        // .nest("/api", UsersRouter::new_router(service_register.clone()))
+
+        // enable console logging
+        tracing_subscriber::fmt::init();
 
         let router = Router::new()
+            .nest("/api", UsersRouter::new_router(service_register.clone()))
             .route("/api/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(
