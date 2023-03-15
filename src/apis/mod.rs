@@ -68,6 +68,7 @@ impl ApplicationController {
         info!("routes initialized, listening on port {}", port);
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
+            .with_graceful_shutdown(Self::shutdown_signal())
             .await
             .context("error while starting API server")?;
 
@@ -120,6 +121,15 @@ impl ApplicationController {
         metrics::histogram!("http_requests_duration_seconds", latency, &labels);
 
         response
+    }
+
+    /// Tokio signal handler that will wait for a user to press CTRL+C.
+    /// We use this in our hyper `Server` method `with_graceful_shutdown`.
+    async fn shutdown_signal() {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("expect tokio signal ctrl-c");
+        println!("signal shutdown");
     }
 
     async fn ping() -> Json<PingResponse> {
