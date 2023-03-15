@@ -26,16 +26,6 @@ impl ConnectionManager {
                 .context("error while running database migrations")?;
         }
 
-        // get all database table
-        let result = sqlx::query(
-            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name NOT LIKE '_sqlx_%'",
-        )
-        .fetch_all(&pool)
-        .await.unwrap();
-
-        for (idx, row) in result.iter().enumerate() {
-            println!("[{}]: {:?}", idx + 1, row.get::<String, &str>("table_name"));
-        }
         Ok(pool)
     }
 }
