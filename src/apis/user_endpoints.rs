@@ -4,8 +4,9 @@ use axum::{Extension, Router};
 use tracing::info;
 
 use crate::dto::user_dto::{
-    LoginUserRequest, RegisterUserRequest, UpdateUserRequest, UserAuthenicationResponse,
+    LoginUserRequest, RegisterUserDto, UpdateUserRequest, UserAuthenicationResponse,
 };
+use crate::middlewares::request_validation_middleware::ValidatedRequest;
 use crate::middlewares::required_authentication_middleware::RequiredAuthentication;
 use crate::services::user_service::DynUsersService;
 use crate::services::ServiceRegister;
@@ -25,15 +26,21 @@ impl UsersRouter {
 
     pub async fn register_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
-        Json(request): Json<RegisterUserRequest>,
+        ValidatedRequest(request): ValidatedRequest<RegisterUserDto>,
     ) -> CustomResult<Json<UserAuthenicationResponse>> {
         info!(
             "recieved request to create user {:?}/{:?}",
-            request.user.email.as_ref().unwrap(),
-            request.user.name.as_ref().unwrap()
+            request.email.as_ref().unwrap(),
+            request.name.as_ref().unwrap()
         );
 
-        let created_user = users_service.register_user(request.user).await?;
+        let created_user = users_service
+            .register_user(RegisterUserDto {
+                name: request.name,
+                email: request.email,
+                password: request.password,
+            })
+            .await?;
 
         Ok(Json(UserAuthenicationResponse { user: created_user }))
     }

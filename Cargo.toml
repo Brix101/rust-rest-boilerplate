@@ -12,6 +12,8 @@ axum = { version = "0.6.10", features = ["tower-log"] }
 clap = { version = "4.1.8", features = ["derive","env"] }
 dotenvy = "0.15.6"
 http = "0.2.9"
+http-body = "0.4.5"
+hyper = { version = "0.14.25", features = ["full"] }
 jsonwebtoken = "8.2.0"
 lazy_static = "1.4.0"
 metrics = "0.20.1"

@@ -1,27 +1,31 @@
-// use async_trait::async_trait;
-// use axum::extract::FromRequest;
-// use axum::http::Request;
-// use axum::{BoxError, Json};
-// use serde::de::DeserializeOwned;
-// use validator::Validate;
+use axum::{async_trait, extract::FromRequest, BoxError, Json, RequestExt};
+use http::Request;
+use serde::de::DeserializeOwned;
+use validator::Validate;
 
-// use crate::core::errors::CustomError;
-// /// use this to encapsulate fields that require validation
-// #[derive(Debug, Clone, Copy, Default)]
-// pub struct ValidationExtractor<T>(pub T);
+use crate::utils::errors::CustomError;
 
-// #[async_trait]
-// impl<S, T, B> FromRequest<S, B> for ValidationExtractor<T>
-// where
-//     T: FromRequest<S, B>,
-//     B: Send + 'static,
-//     S: Send + Sync,
-// {
-//     type Rejection = CustomError;
+pub struct ValidatedRequest<T>(pub T);
 
-//     async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
-//         let Json(value) = Json::<T>::from_request(req, state).await?;
-//         value.validate()?;
-//         Ok(ValidationExtractor(value))
-//     }
-// }
+#[async_trait]
+impl<S, B, T> FromRequest<S, B> for ValidatedRequest<T>
+where
+    S: Send + Sync,
+    T: DeserializeOwned + Validate + 'static,
+    B: http_body::Body + Send + 'static,
+    B::Data: Send,
+    B::Error: Into<BoxError>,
+{
+    type Rejection = CustomError;
+
+    async fn from_request(req: Request<B>, _state: &S) -> Result<Self, Self::Rejection> {
+        let Json(data) = req
+            .extract::<Json<T>, _>()
+            .await
+            .map_err(|_| CustomError::BadRequest("Invalid JSON body".to_string()))?;
+
+        data.validate()
+            .map_err(|_| CustomError::BadRequest("Invalid JSON body".to_string()))?;
+        Ok(Self(data))
+    }
+}
