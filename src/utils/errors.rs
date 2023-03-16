@@ -54,23 +54,26 @@ impl CustomError {
         for (field_property, error_kind) in errors.into_errors() {
             if let ValidationErrorsKind::Field(field_meta) = error_kind.clone() {
                 for error in field_meta.into_iter() {
-                    println!("{:#?}", error);
                     validation_errors
                         .entry(Cow::from(field_property))
                         .or_insert_with(Vec::new)
                         .push(error.message.unwrap_or_else(|| {
                             // required validators contain None for their message, assume a default response
-                            Cow::from(format!("{} is required", field_property))
+                            let params: Vec<Cow<'static, str>> = error
+                                .params
+                                .iter()
+                                .filter(|(key, _value)| key.to_owned() != "value")
+                                .map(|(key, value)| {
+                                    Cow::from(format!("{} value is {}", key, value.to_string()))
+                                })
+                                .collect();
+
+                            if params.len() >= 1 {
+                                Cow::from(params.join(", "))
+                            } else {
+                                Cow::from(format!("{} is required", field_property))
+                            }
                         }))
-                    // .extend_from_slice(
-                    //     &error
-                    //         .params
-                    //         .iter()
-                    //         .filter(|(key, _value)| key.to_owned() != "value")
-                    //         .map(|(key, value)| -> Cow<'static, str> {
-                    //             Cow::from(format!("{} value is {}", key, value))
-                    //         }),
-                    // );
                 }
             }
             // structs may contain validators on themselves, roll through first-depth validators
