@@ -50,23 +50,6 @@ pub struct UserProfileDto {
     pub following: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Validate, Default)]
-pub struct RegisterUserRequest {
-    #[validate]
-    pub user: RegisterUserDto,
-}
-
-#[derive(Serialize, Deserialize, Debug, Validate)]
-pub struct LoginUserRequest {
-    #[validate]
-    pub user: LoginUserDto,
-}
-
-#[derive(Deserialize, Serialize, Debug, Default)]
-pub struct UpdateUserRequest {
-    pub user: UpdateUserDto,
-}
-
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
 pub struct RegisterUserDto {
     #[validate(required, length(min = 1))]

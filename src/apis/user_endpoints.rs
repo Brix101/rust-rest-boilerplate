@@ -4,13 +4,14 @@ use axum::{Extension, Router};
 use tracing::info;
 
 use crate::dto::user_dto::{
-    LoginUserDto, RegisterUserDto, UpdateUserRequest, UserAuthenicationResponse,
+    LoginUserDto, RegisterUserDto, UpdateUserDto, UserAuthenicationResponse,
 };
 use crate::middlewares::request_validation_middleware::ValidatedRequest;
 use crate::middlewares::required_authentication_middleware::RequiredAuthentication;
 use crate::services::user_service::DynUsersService;
 use crate::services::ServiceRegister;
 use crate::utils::errors::CustomResult;
+
 pub struct UsersRouter;
 
 impl UsersRouter {
@@ -66,11 +67,11 @@ impl UsersRouter {
     pub async fn update_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
         RequiredAuthentication(user_id): RequiredAuthentication,
-        Json(request): Json<UpdateUserRequest>,
+        Json(request): Json<UpdateUserDto>,
     ) -> CustomResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to update user {:?}", user_id);
 
-        let updated_user = users_service.updated_user(user_id, request.user).await?;
+        let updated_user = users_service.updated_user(user_id, request).await?;
 
         Ok(Json(UserAuthenicationResponse { user: updated_user }))
     }
