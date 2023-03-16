@@ -73,7 +73,7 @@ pub struct RegisterUserDto {
     pub name: Option<String>,
     #[validate(required, length(min = 1), email(message = "email is invalid"))]
     pub email: Option<String>,
-    #[validate(required, length(min = 1))]
+    #[validate(required, length(min = 6))]
     pub password: Option<String>,
 }
 
@@ -81,7 +81,7 @@ pub struct RegisterUserDto {
 pub struct LoginUserDto {
     #[validate(required, length(min = 1), email(message = "email is invalid"))]
     pub email: Option<String>,
-    #[validate(required, length(min = 1))]
+    #[validate(required, length(min = 6))]
     pub password: Option<String>,
 }
 

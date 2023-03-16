@@ -1,6 +1,6 @@
 use anyhow::{Context, Ok};
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{Pool, Postgres, Row};
+use sqlx::{Pool, Postgres};
 use tracing::info;
 
 pub type ConnectionPool = Pool<Postgres>;

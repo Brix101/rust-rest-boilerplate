@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::{collections::HashMap, fmt::Debug};
 
+use axum::extract::rejection::JsonRejection;
 use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde_json::json;
@@ -39,7 +40,7 @@ pub enum CustomError {
     #[error(transparent)]
     ValidationError(#[from] ValidationErrors),
     #[error(transparent)]
-    AxumJsonRejection(#[from] axum::extract::rejection::JsonRejection),
+    AxumJsonRejection(#[from] JsonRejection),
     #[error(transparent)]
     AnyhowError(#[from] anyhow::Error),
 }
@@ -50,9 +51,30 @@ impl CustomError {
         let mut validation_errors = CustomErrorMap::new();
 
         // roll through the struct errors at the top level
-        for (_, error_kind) in errors.into_errors() {
+        for (field_property, error_kind) in errors.into_errors() {
+            if let ValidationErrorsKind::Field(field_meta) = error_kind.clone() {
+                for error in field_meta.into_iter() {
+                    println!("{:#?}", error);
+                    validation_errors
+                        .entry(Cow::from(field_property))
+                        .or_insert_with(Vec::new)
+                        .push(error.message.unwrap_or_else(|| {
+                            // required validators contain None for their message, assume a default response
+                            Cow::from(format!("{} is required", field_property))
+                        }))
+                    // .extend_from_slice(
+                    //     &error
+                    //         .params
+                    //         .iter()
+                    //         .filter(|(key, _value)| key.to_owned() != "value")
+                    //         .map(|(key, value)| -> Cow<'static, str> {
+                    //             Cow::from(format!("{} value is {}", key, value))
+                    //         }),
+                    // );
+                }
+            }
             // structs may contain validators on themselves, roll through first-depth validators
-            if let ValidationErrorsKind::Struct(meta) = error_kind {
+            if let ValidationErrorsKind::Struct(meta) = error_kind.clone() {
                 // on structs with validation errors, roll through each of the structs properties to build a list of errors
                 for (struct_property, struct_error_kind) in meta.into_errors() {
                     if let ValidationErrorsKind::Field(field_meta) = struct_error_kind {
@@ -74,7 +96,7 @@ impl CustomError {
             "error": validation_errors,
         }));
 
-        (StatusCode::UNPROCESSABLE_ENTITY, body).into_response()
+        (StatusCode::BAD_REQUEST, body).into_response()
     }
 }
 
@@ -93,6 +115,7 @@ impl IntoResponse for CustomError {
                 Self::InvalidLoginAttmpt.to_string(),
             ),
             Self::Unauthorized => (StatusCode::UNAUTHORIZED, Self::Unauthorized.to_string()),
+            Self::AxumJsonRejection(err) => (StatusCode::BAD_REQUEST, err.body_text()),
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 String::from("unexpected error occurred"),

@@ -14,7 +14,7 @@ use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
 use tower::ServiceBuilder;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
-use tracing::info;
+use tracing::{debug, info};
 
 use crate::apis::user_endpoints::UsersRouter;
 use crate::{dto::PingResponse, services::ServiceRegister};
@@ -65,7 +65,7 @@ impl ApplicationController {
             .route_layer(middleware::from_fn(Self::track_metrics));
 
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
-        info!("routes initialized, listening on port {}", port);
+        debug!("routes initialized, listening on port {}", port);
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
             .with_graceful_shutdown(Self::shutdown_signal())
