@@ -51,7 +51,7 @@ pub struct UserProfileDto {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
-pub struct RegisterUserDto {
+pub struct SignUpUserDto {
     #[validate(required, length(min = 1))]
     pub name: Option<String>,
     #[validate(required, length(min = 1), email(message = "email is invalid"))]
@@ -61,7 +61,7 @@ pub struct RegisterUserDto {
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
-pub struct LoginUserDto {
+pub struct SignInUserDto {
     #[validate(required, length(min = 1), email(message = "email is invalid"))]
     pub email: Option<String>,
     #[validate(required, length(min = 6))]
@@ -77,7 +77,7 @@ pub struct UpdateUserDto {
     pub image: Option<String>,
 }
 
-impl RegisterUserDto {
+impl SignUpUserDto {
     pub fn new_stub() -> Self {
         Self {
             name: Some(String::from("stub name")),
@@ -87,7 +87,7 @@ impl RegisterUserDto {
     }
 }
 
-impl LoginUserDto {
+impl SignInUserDto {
     pub fn new_stub() -> Self {
         Self {
             email: Some(String::from("stub email")),

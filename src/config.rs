@@ -13,7 +13,10 @@ pub struct AppConfig {
     pub argon_salt: String,
 
     #[clap(long, env)]
-    pub token_secret: String,
+    pub access_token_secret: String,
+
+    #[clap(long, env)]
+    pub refresh_token_secret: String,
 
     #[clap(long, env)]
     pub cors_origin: String,

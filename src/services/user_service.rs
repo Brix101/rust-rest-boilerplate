@@ -4,7 +4,7 @@ use tracing::{error, info};
 use async_trait::async_trait;
 
 use crate::{
-    dto::user_dto::{LoginUserDto, RegisterUserDto, ResponseUserDto, UpdateUserDto},
+    dto::user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
     repositories::user_repository::DynUsersRepository,
     utils::{
         errors::{AppError, AppResult},
@@ -19,9 +19,9 @@ pub type DynUsersService = Arc<dyn UsersServiceTrait + Send + Sync>;
 
 #[async_trait]
 pub trait UsersServiceTrait {
-    async fn register_user(&self, request: RegisterUserDto) -> AppResult<ResponseUserDto>;
+    async fn signup_user(&self, request: SignUpUserDto) -> AppResult<ResponseUserDto>;
 
-    async fn login_user(&self, request: LoginUserDto) -> AppResult<ResponseUserDto>;
+    async fn signin_user(&self, request: SignInUserDto) -> AppResult<ResponseUserDto>;
 
     async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto>;
 
@@ -55,7 +55,7 @@ impl UsersService {
 
 #[async_trait]
 impl UsersServiceTrait for UsersService {
-    async fn register_user(&self, request: RegisterUserDto) -> AppResult<ResponseUserDto> {
+    async fn signup_user(&self, request: SignUpUserDto) -> AppResult<ResponseUserDto> {
         let email = request.email.unwrap();
         let name = request.name.unwrap();
         let password = request.password.unwrap();
@@ -79,12 +79,12 @@ impl UsersServiceTrait for UsersService {
         info!("user successfully created, generating token");
         let token = self
             .token_service
-            .new_token(created_user.id, &created_user.email)?;
+            .new_access_token(created_user.id, &created_user.email)?;
 
         Ok(created_user.into_dto(token))
     }
 
-    async fn login_user(&self, request: LoginUserDto) -> AppResult<ResponseUserDto> {
+    async fn signin_user(&self, request: SignInUserDto) -> AppResult<ResponseUserDto> {
         let email = request.email.unwrap();
         let attempted_password = request.password.unwrap();
 
@@ -110,7 +110,7 @@ impl UsersServiceTrait for UsersService {
         }
 
         info!("user login successful, generating token");
-        let token = self.token_service.new_token(user.id, &user.email)?;
+        let token = self.token_service.new_access_token(user.id, &user.email)?;
 
         Ok(user.into_dto(token))
     }
@@ -123,7 +123,9 @@ impl UsersServiceTrait for UsersService {
             "user found with email {:?}, generating new token",
             user.email
         );
-        let token = self.token_service.new_token(user.id, user.email.as_str())?;
+        let token = self
+            .token_service
+            .new_access_token(user.id, user.email.as_str())?;
 
         Ok(user.into_dto(token))
     }
@@ -165,7 +167,7 @@ impl UsersServiceTrait for UsersService {
         info!("user {:?} updated, generating a new token", user_id);
         let token = self
             .token_service
-            .new_token(user_id, updated_email.as_str())?;
+            .new_access_token(user_id, updated_email.as_str())?;
 
         Ok(updated_user.into_dto(token))
     }

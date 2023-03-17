@@ -16,15 +16,23 @@ pub type DynJwtUtils = Arc<dyn JwtUtils + Send + Sync>;
 
 // #[automock]
 pub trait JwtUtils {
-    fn new_token(&self, user_id: i64, email: &str) -> AppResult<String>;
+    fn new_access_token(&self, user_id: i64, email: &str) -> AppResult<String>;
+    fn new_refresh_token(&self, sub: i64) -> AppResult<String>;
     fn get_user_id_from_token(&self, token: String) -> AppResult<i64>;
 }
 
 /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
 #[derive(Debug, Serialize, Deserialize)]
-struct Claims {
+struct AccessTokenClaims {
     sub: String,
     user_id: i64,
+    exp: usize,
+}
+
+/// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
+#[derive(Debug, Serialize, Deserialize)]
+struct RefreshTokenClaims {
+    sub: i64,
     exp: usize,
 }
 
@@ -39,12 +47,12 @@ impl JwtService {
 }
 
 impl JwtUtils for JwtService {
-    fn new_token(&self, user_id: i64, email: &str) -> AppResult<String> {
-        let from_now = Duration::from_secs(3600);
+    fn new_access_token(&self, user_id: i64, email: &str) -> AppResult<String> {
+        let from_now = Duration::from_secs(86400);
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
 
-        let claims = Claims {
+        let claims = AccessTokenClaims {
             sub: String::from(email),
             exp: exp.unix_timestamp() as usize,
             user_id,
@@ -53,7 +61,27 @@ impl JwtUtils for JwtService {
         let token = encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(self.config.token_secret.as_bytes()),
+            &EncodingKey::from_secret(self.config.access_token_secret.as_bytes()),
+        )
+        .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
+
+        Ok(token)
+    }
+
+    fn new_refresh_token(&self, sub: i64) -> AppResult<String> {
+        let from_now = Duration::from_secs(86400);
+        let expired_future_time = SystemTime::now().add(from_now);
+        let exp = OffsetDateTime::from(expired_future_time);
+
+        let claims = RefreshTokenClaims {
+            sub,
+            exp: exp.unix_timestamp() as usize,
+        };
+
+        let token = encode(
+            &Header::default(),
+            &claims,
+            &EncodingKey::from_secret(self.config.access_token_secret.as_bytes()),
         )
         .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
 
@@ -61,9 +89,9 @@ impl JwtUtils for JwtService {
     }
 
     fn get_user_id_from_token(&self, token: String) -> AppResult<i64> {
-        let decoded_token = decode::<Claims>(
+        let decoded_token = decode::<AccessTokenClaims>(
             token.as_str(),
-            &DecodingKey::from_secret(self.config.token_secret.as_bytes()),
+            &DecodingKey::from_secret(self.config.access_token_secret.as_bytes()),
             &Validation::new(Algorithm::HS256),
         )
         .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
