@@ -6,7 +6,7 @@ use http::header::AUTHORIZATION;
 use tracing::error;
 
 use crate::utils::errors::CustomError;
-use crate::utils::jwt_utils::DynTokenService;
+use crate::utils::jwt_utils::DynJwtUtils;
 
 /// Extracts the JWT from the Authorization token header.
 pub struct RequiredAuthentication(pub i64);
@@ -18,7 +18,7 @@ where
 {
     type Rejection = CustomError;
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Extension(token_service): Extension<DynTokenService> =
+        let Extension(token_service): Extension<DynJwtUtils> =
             Extension::from_request_parts(parts, state)
                 .await
                 .map_err(|err| CustomError::InternalServerErrorWithContext(err.to_string()))?;

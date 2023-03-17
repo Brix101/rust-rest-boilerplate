@@ -9,7 +9,7 @@ use crate::{
     services::user_service::UsersService,
     utils::{
         connection_pool::ConnectionPool,
-        jwt_utils::{DynTokenService, JwtService},
+        jwt_utils::{DynJwtUtils, JwtService},
         password_util::{ArgonSecurityService, DynArgonService},
     },
 };
@@ -21,7 +21,7 @@ pub mod user_service;
 #[derive(Clone)]
 pub struct ServiceRegister {
     pub users_service: DynUsersService,
-    pub token_service: DynTokenService,
+    pub token_service: DynJwtUtils,
 }
 
 impl ServiceRegister {
@@ -29,7 +29,7 @@ impl ServiceRegister {
         info!("initializing utility services...");
         let security_service =
             Arc::new(ArgonSecurityService::new(config.clone())) as DynArgonService;
-        let token_service = Arc::new(JwtService::new(config)) as DynTokenService;
+        let token_service = Arc::new(JwtService::new(config)) as DynJwtUtils;
 
         info!("utility services initialized, building feature services...");
         let users_repository = Arc::new(UsersQuery::new(pool.clone())) as DynUsersRepository;

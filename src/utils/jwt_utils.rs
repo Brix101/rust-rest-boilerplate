@@ -12,10 +12,10 @@ use super::errors::{CustomError, CustomResult};
 // use mockall::automock;
 
 /// A security service for handling JWT authentication.
-pub type DynTokenService = Arc<dyn TokenService + Send + Sync>;
+pub type DynJwtUtils = Arc<dyn JwtUtils + Send + Sync>;
 
 // #[automock]
-pub trait TokenService {
+pub trait JwtUtils {
     fn new_token(&self, user_id: i64, email: &str) -> CustomResult<String>;
     fn get_user_id_from_token(&self, token: String) -> CustomResult<i64>;
 }
@@ -38,7 +38,7 @@ impl JwtService {
     }
 }
 
-impl TokenService for JwtService {
+impl JwtUtils for JwtService {
     fn new_token(&self, user_id: i64, email: &str) -> CustomResult<String> {
         let from_now = Duration::from_secs(3600);
         let expired_future_time = SystemTime::now().add(from_now);

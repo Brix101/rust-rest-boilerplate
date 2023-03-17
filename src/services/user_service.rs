@@ -8,7 +8,7 @@ use crate::{
     repositories::user_repository::DynUsersRepository,
     utils::{
         errors::{CustomError, CustomResult},
-        jwt_utils::DynTokenService,
+        jwt_utils::DynJwtUtils,
         password_util::DynArgonService,
     },
 };
@@ -36,14 +36,14 @@ pub trait UsersServiceTrait {
 pub struct UsersService {
     repository: DynUsersRepository,
     security_service: DynArgonService,
-    token_service: DynTokenService,
+    token_service: DynJwtUtils,
 }
 
 impl UsersService {
     pub fn new(
         repository: DynUsersRepository,
         security_service: DynArgonService,
-        token_service: DynTokenService,
+        token_service: DynJwtUtils,
     ) -> Self {
         Self {
             repository,
