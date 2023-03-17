@@ -8,7 +8,8 @@ create table if not exists users
     bio        varchar     not null default '',
     image      varchar     not null default '',
     created_at timestamptz not null default current_timestamp,
-    updated_at timestamptz not null default current_timestamp
+    updated_at timestamptz not null default current_timestamp,
+    deleted_at timestamptz default null
 );
 
 alter table users
