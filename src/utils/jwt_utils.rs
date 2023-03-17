@@ -8,7 +8,7 @@ use sqlx::types::time::OffsetDateTime;
 
 use crate::config::AppConfig;
 
-use super::errors::{CustomError, CustomResult};
+use super::errors::{AppError, AppResult};
 // use mockall::automock;
 
 /// A security service for handling JWT authentication.
@@ -16,8 +16,8 @@ pub type DynJwtUtils = Arc<dyn JwtUtils + Send + Sync>;
 
 // #[automock]
 pub trait JwtUtils {
-    fn new_token(&self, user_id: i64, email: &str) -> CustomResult<String>;
-    fn get_user_id_from_token(&self, token: String) -> CustomResult<i64>;
+    fn new_token(&self, user_id: i64, email: &str) -> AppResult<String>;
+    fn get_user_id_from_token(&self, token: String) -> AppResult<i64>;
 }
 
 /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
@@ -39,7 +39,7 @@ impl JwtService {
 }
 
 impl JwtUtils for JwtService {
-    fn new_token(&self, user_id: i64, email: &str) -> CustomResult<String> {
+    fn new_token(&self, user_id: i64, email: &str) -> AppResult<String> {
         let from_now = Duration::from_secs(3600);
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
@@ -55,18 +55,18 @@ impl JwtUtils for JwtService {
             &claims,
             &EncodingKey::from_secret(self.config.token_secret.as_bytes()),
         )
-        .map_err(|err| CustomError::InternalServerErrorWithContext(err.to_string()))?;
+        .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(token)
     }
 
-    fn get_user_id_from_token(&self, token: String) -> CustomResult<i64> {
+    fn get_user_id_from_token(&self, token: String) -> AppResult<i64> {
         let decoded_token = decode::<Claims>(
             token.as_str(),
             &DecodingKey::from_secret(self.config.token_secret.as_bytes()),
             &Validation::new(Algorithm::HS256),
         )
-        .map_err(|err| CustomError::InternalServerErrorWithContext(err.to_string()))?;
+        .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(decoded_token.claims.user_id)
     }

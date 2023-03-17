@@ -10,7 +10,7 @@ use crate::middlewares::request_validation_middleware::ValidatedRequest;
 use crate::middlewares::required_authentication_middleware::RequiredAuthentication;
 use crate::services::user_service::DynUsersService;
 use crate::services::ServiceRegister;
-use crate::utils::errors::CustomResult;
+use crate::utils::errors::AppResult;
 
 pub struct UsersRouter;
 
@@ -28,7 +28,7 @@ impl UsersRouter {
     pub async fn register_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
         ValidatedRequest(request): ValidatedRequest<RegisterUserDto>,
-    ) -> CustomResult<Json<UserAuthenicationResponse>> {
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!(
             "recieved request to create user {:?}/{:?}",
             request.email.as_ref().unwrap(),
@@ -42,7 +42,7 @@ impl UsersRouter {
     pub async fn login_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
         ValidatedRequest(request): ValidatedRequest<LoginUserDto>,
-    ) -> CustomResult<Json<UserAuthenicationResponse>> {
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!(
             "recieved request to login user {:?}",
             request.email.as_ref().unwrap()
@@ -56,7 +56,7 @@ impl UsersRouter {
     pub async fn get_current_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
         RequiredAuthentication(user_id): RequiredAuthentication,
-    ) -> CustomResult<Json<UserAuthenicationResponse>> {
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to retrieve current user");
 
         let current_user = users_service.get_current_user(user_id).await?;
@@ -68,7 +68,7 @@ impl UsersRouter {
         Extension(users_service): Extension<DynUsersService>,
         RequiredAuthentication(user_id): RequiredAuthentication,
         Json(request): Json<UpdateUserDto>,
-    ) -> CustomResult<Json<UserAuthenicationResponse>> {
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to update user {:?}", user_id);
 
         let updated_user = users_service.updated_user(user_id, request).await?;

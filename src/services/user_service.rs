@@ -7,7 +7,7 @@ use crate::{
     dto::user_dto::{LoginUserDto, RegisterUserDto, ResponseUserDto, UpdateUserDto},
     repositories::user_repository::DynUsersRepository,
     utils::{
-        errors::{CustomError, CustomResult},
+        errors::{AppError, AppResult},
         jwt_utils::DynJwtUtils,
         password_util::DynArgonService,
     },
@@ -19,17 +19,17 @@ pub type DynUsersService = Arc<dyn UsersServiceTrait + Send + Sync>;
 
 #[async_trait]
 pub trait UsersServiceTrait {
-    async fn register_user(&self, request: RegisterUserDto) -> CustomResult<ResponseUserDto>;
+    async fn register_user(&self, request: RegisterUserDto) -> AppResult<ResponseUserDto>;
 
-    async fn login_user(&self, request: LoginUserDto) -> CustomResult<ResponseUserDto>;
+    async fn login_user(&self, request: LoginUserDto) -> AppResult<ResponseUserDto>;
 
-    async fn get_current_user(&self, user_id: i64) -> CustomResult<ResponseUserDto>;
+    async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto>;
 
     async fn updated_user(
         &self,
         user_id: i64,
         request: UpdateUserDto,
-    ) -> CustomResult<ResponseUserDto>;
+    ) -> AppResult<ResponseUserDto>;
 }
 
 #[derive(Clone)]
@@ -55,7 +55,7 @@ impl UsersService {
 
 #[async_trait]
 impl UsersServiceTrait for UsersService {
-    async fn register_user(&self, request: RegisterUserDto) -> CustomResult<ResponseUserDto> {
+    async fn register_user(&self, request: RegisterUserDto) -> AppResult<ResponseUserDto> {
         let email = request.email.unwrap();
         let name = request.name.unwrap();
         let password = request.password.unwrap();
@@ -64,7 +64,7 @@ impl UsersServiceTrait for UsersService {
 
         if existing_user.is_some() {
             error!("user {:?} already exists", email);
-            return Err(CustomError::ObjectConflict(String::from("email is taken")));
+            return Err(AppError::ObjectConflict(String::from("email is taken")));
         }
 
         info!("creating password hash for user {:?}", email);
@@ -84,7 +84,7 @@ impl UsersServiceTrait for UsersService {
         Ok(created_user.into_dto(token))
     }
 
-    async fn login_user(&self, request: LoginUserDto) -> CustomResult<ResponseUserDto> {
+    async fn login_user(&self, request: LoginUserDto) -> AppResult<ResponseUserDto> {
         let email = request.email.unwrap();
         let attempted_password = request.password.unwrap();
 
@@ -92,7 +92,7 @@ impl UsersServiceTrait for UsersService {
         let existing_user = self.repository.get_user_by_email(&email).await?;
 
         if existing_user.is_none() {
-            return Err(CustomError::NotFound(String::from(
+            return Err(AppError::NotFound(String::from(
                 "user email does not exist",
             )));
         }
@@ -106,7 +106,7 @@ impl UsersServiceTrait for UsersService {
 
         if !is_valid_login_attempt {
             error!("invalid login attempt for user {:?}", email);
-            return Err(CustomError::InvalidLoginAttmpt);
+            return Err(AppError::InvalidLoginAttmpt);
         }
 
         info!("user login successful, generating token");
@@ -115,7 +115,7 @@ impl UsersServiceTrait for UsersService {
         Ok(user.into_dto(token))
     }
 
-    async fn get_current_user(&self, user_id: i64) -> CustomResult<ResponseUserDto> {
+    async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto> {
         info!("retrieving user {:?}", user_id);
         let user = self.repository.get_user_by_id(user_id).await?;
 
@@ -132,7 +132,7 @@ impl UsersServiceTrait for UsersService {
         &self,
         user_id: i64,
         request: UpdateUserDto,
-    ) -> CustomResult<ResponseUserDto> {
+    ) -> AppResult<ResponseUserDto> {
         info!("retrieving user {:?}", user_id);
         let user = self.repository.get_user_by_id(user_id).await?;
 

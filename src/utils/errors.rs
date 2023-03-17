@@ -11,12 +11,12 @@ use validator::{ValidationErrors, ValidationErrorsKind};
 
 use crate::dto::ApiError;
 
-pub type CustomResult<T> = Result<T, CustomError>;
+pub type AppResult<T> = Result<T, AppError>;
 
-pub type CustomErrorMap = HashMap<Cow<'static, str>, Vec<Cow<'static, str>>>;
+pub type AppErrorMap = HashMap<Cow<'static, str>, Vec<Cow<'static, str>>>;
 
 #[derive(Error, Debug)]
-pub enum CustomError {
+pub enum AppError {
     #[error("authentication is required to access this resource")]
     Unauthorized,
     #[error("username or password is incorrect")]
@@ -36,7 +36,7 @@ pub enum CustomError {
     #[error("{0}")]
     ObjectConflict(String),
     #[error("unprocessable request has occurred")]
-    UnprocessableEntity { errors: CustomErrorMap },
+    UnprocessableEntity { errors: AppErrorMap },
     #[error(transparent)]
     ValidationError(#[from] ValidationErrors),
     #[error(transparent)]
@@ -45,10 +45,10 @@ pub enum CustomError {
     AnyhowError(#[from] anyhow::Error),
 }
 
-impl CustomError {
+impl AppError {
     /// Maps `validator`'s `ValidationrErrors` to a simple map of property name/error messages structure.
     pub fn unprocessable_entity(errors: ValidationErrors) -> Response {
-        let mut validation_errors = CustomErrorMap::new();
+        let mut validation_errors = AppErrorMap::new();
 
         // roll through the struct errors at the top level
         for (field_property, error_kind) in errors.into_errors() {
@@ -103,7 +103,7 @@ impl CustomError {
     }
 }
 
-impl IntoResponse for CustomError {
+impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         if let Self::ValidationError(e) = self {
             return Self::unprocessable_entity(e);

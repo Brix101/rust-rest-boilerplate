@@ -4,7 +4,7 @@ use argon2::Config;
 
 use crate::config::AppConfig;
 
-use super::errors::{CustomError, CustomResult};
+use super::errors::{AppError, AppResult};
 // use mockall::automock;
 
 /// A security service for handling JWT authentication.
@@ -12,13 +12,13 @@ pub type DynArgonService = Arc<dyn ArgonService + Send + Sync>;
 
 // #[automock]
 pub trait ArgonService {
-    fn hash_password(&self, raw_password: &str) -> CustomResult<String>;
+    fn hash_password(&self, raw_password: &str) -> AppResult<String>;
 
     fn verify_password(
         &self,
         stored_password: &str,
         attempted_password: String,
-    ) -> CustomResult<bool>;
+    ) -> AppResult<bool>;
 }
 
 pub struct ArgonSecurityService {
@@ -32,7 +32,7 @@ impl ArgonSecurityService {
 }
 
 impl ArgonService for ArgonSecurityService {
-    fn hash_password(&self, raw_password: &str) -> CustomResult<String> {
+    fn hash_password(&self, raw_password: &str) -> AppResult<String> {
         let password_bytes = raw_password.as_bytes();
         let hashed_password = argon2::hash_encoded(
             password_bytes,
@@ -48,10 +48,10 @@ impl ArgonService for ArgonSecurityService {
         &self,
         stored_password: &str,
         attempted_password: String,
-    ) -> CustomResult<bool> {
+    ) -> AppResult<bool> {
         let hashes_match =
             argon2::verify_encoded(stored_password, attempted_password.as_bytes())
-                .map_err(|err| CustomError::InternalServerErrorWithContext(err.to_string()))?;
+                .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(hashes_match)
     }
