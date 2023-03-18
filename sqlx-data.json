@@ -42,6 +42,11 @@
           "name": "updated_at",
           "ordinal": 7,
           "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
         }
       ],
       "nullable": [
@@ -52,7 +57,8 @@
         false,
         false,
         false,
-        false
+        false,
+        true
       ],
       "parameters": {
         "Left": [
@@ -61,6 +67,46 @@
       }
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
+  },
+  "43bbeb7d4ed2e97cafba890f15976ecf04a8576047e5af495165541c3cbb9986": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "exp",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_agent",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Varchar",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\n        insert into user_sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
   },
   "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
     "describe": {
@@ -104,6 +150,11 @@
           "name": "updated_at",
           "ordinal": 7,
           "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
         }
       ],
       "nullable": [
@@ -114,7 +165,8 @@
         false,
         false,
         false,
-        false
+        false,
+        true
       ],
       "parameters": {
         "Left": [
@@ -171,6 +223,11 @@
           "name": "updated_at",
           "ordinal": 7,
           "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
         }
       ],
       "nullable": [
@@ -181,7 +238,8 @@
         false,
         false,
         false,
-        false
+        false,
+        true
       ],
       "parameters": {
         "Left": [
@@ -192,6 +250,74 @@
       }
     },
     "query": "\n        insert into users (created_at, updated_at, name, email, password, bio, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '', '')\n        returning *\n            "
+  },
+  "a1f2a6a5f0b3bf75267d257217cd496e3b7ecad2fcf36fe7dfaa7f8873a699d0": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "password",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "bio",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "image",
+          "ordinal": 5,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select users.* from users\n        inner join user_sessions\n        on users.id = user_sessions.user_id\n        where user_sessions.id = $1\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {
@@ -235,6 +361,11 @@
           "name": "updated_at",
           "ordinal": 7,
           "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
         }
       ],
       "nullable": [
@@ -245,7 +376,8 @@
         false,
         false,
         false,
-        false
+        false,
+        true
       ],
       "parameters": {
         "Left": [

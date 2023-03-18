@@ -30,11 +30,12 @@ impl SessionsRepository for SessionsQuery {
             SessionEntity,
             r#"
         insert into user_sessions (user_id,user_agent,exp)
-        values ($1,$2,'2023-03-17 09:02:37.447991+00')
+        values ($1,$2,$3)
         returning *
             "#,
             user_id,
             user_agent,
+            exp
         )
         .fetch_one(&self.pool)
         .await
@@ -45,9 +46,10 @@ impl SessionsRepository for SessionsQuery {
         query_as!(
             UserEntity,
             r#"
-        select *
-        from users
-        where id = $1
+        select users.* from users
+        inner join user_sessions
+        on users.id = user_sessions.user_id
+        where user_sessions.id = $1
             "#,
             id,
         )
