@@ -4,7 +4,7 @@ use anyhow::Context;
 use clap::Parser;
 use dotenvy::dotenv;
 use rust_rest::{
-    apis::ApplicationController, config::AppConfig, services::ServiceRegister,
+    config::AppConfig, controllers::ApplicationController, services::ServiceRegister,
     utils::connection_pool::ConnectionManager,
 };
 use tracing::info;
