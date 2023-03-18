@@ -1,61 +1,47 @@
 use anyhow::Context;
 use async_trait::async_trait;
 use sqlx::query_as;
+use sqlx::types::time::OffsetDateTime;
 
-use crate::repositories::user_repository::{UserEntity, UsersRepository};
+use crate::repositories::session_repository::{SessionEntity, SessionsRepository};
+use crate::repositories::user_repository::UserEntity;
 use crate::utils::connection_pool::ConnectionPool;
 
 #[derive(Clone)]
-pub struct UsersQuery {
+pub struct SessionsQuery {
     pool: ConnectionPool,
 }
 
-impl UsersQuery {
+impl SessionsQuery {
     pub fn new(pool: ConnectionPool) -> Self {
         Self { pool }
     }
 }
 
 #[async_trait]
-impl UsersRepository for UsersQuery {
-    async fn create_user(
+impl SessionsRepository for SessionsQuery {
+    async fn create_session(
         &self,
-        email: &str,
-        name: &str,
-        hash_password: &str,
-    ) -> anyhow::Result<UserEntity> {
+        user_id: &i64,
+        user_agent: &str,
+        exp: &OffsetDateTime,
+    ) -> anyhow::Result<SessionEntity> {
         query_as!(
-            UserEntity,
+            SessionEntity,
             r#"
-        insert into users (created_at, updated_at, name, email, password, bio, image)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '', '')
+        insert into user_sessions (user_id,user_agent,exp)
+        values ($1,$2,'2023-03-17 09:02:37.447991+00')
         returning *
             "#,
-            name,
-            email,
-            hash_password
+            user_id,
+            user_agent,
         )
         .fetch_one(&self.pool)
         .await
-        .context("an unexpected error occured while creating the user")
+        .context("an unexpected error occured while creating a session")
     }
 
-    async fn get_user_by_email(&self, email: &str) -> anyhow::Result<Option<UserEntity>> {
-        query_as!(
-            UserEntity,
-            r#"
-        select *
-        from users
-        where email = $1::varchar
-            "#,
-            email,
-        )
-        .fetch_optional(&self.pool)
-        .await
-        .context("unexpected error while querying for user by email")
-    }
-
-    async fn get_user_by_id(&self, id: i64) -> anyhow::Result<UserEntity> {
+    async fn get_user_session_by_id(&self, id: i64) -> anyhow::Result<UserEntity> {
         query_as!(
             UserEntity,
             r#"
@@ -68,40 +54,5 @@ impl UsersRepository for UsersQuery {
         .fetch_one(&self.pool)
         .await
         .context("user was not found")
-    }
-
-    async fn update_user(
-        &self,
-        id: i64,
-        email: String,
-        name: String,
-        password: String,
-        bio: String,
-        image: String,
-    ) -> anyhow::Result<UserEntity> {
-        query_as!(
-            UserEntity,
-            r#"
-        update users
-        set
-            name = $1::varchar,
-            email = $2::varchar,
-            password = $3::varchar,
-            bio = $4::varchar,
-            image = $5::varchar,
-            updated_at = current_timestamp
-        where id = $6
-        returning *
-            "#,
-            name,
-            email,
-            password,
-            bio,
-            image,
-            id
-        )
-        .fetch_one(&self.pool)
-        .await
-        .context("could not update the user")
     }
 }
