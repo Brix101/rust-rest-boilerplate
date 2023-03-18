@@ -7,9 +7,9 @@ use crate::{
     dto::user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
     repositories::user_repository::DynUsersRepository,
     utils::{
+        argon_util::DynArgonUtil,
         errors::{AppError, AppResult},
-        jwt_utils::DynJwtUtils,
-        password_util::DynArgonService,
+        jwt_utils::DynJwtUtil,
     },
 };
 
@@ -35,20 +35,20 @@ pub trait UsersServiceTrait {
 #[derive(Clone)]
 pub struct UsersService {
     repository: DynUsersRepository,
-    security_service: DynArgonService,
-    token_service: DynJwtUtils,
+    argon_util: DynArgonUtil,
+    token_util: DynJwtUtil,
 }
 
 impl UsersService {
     pub fn new(
         repository: DynUsersRepository,
-        security_service: DynArgonService,
-        token_service: DynJwtUtils,
+        security_service: DynArgonUtil,
+        token_service: DynJwtUtil,
     ) -> Self {
         Self {
             repository,
-            security_service,
-            token_service,
+            argon_util: security_service,
+            token_util: token_service,
         }
     }
 }
@@ -68,7 +68,7 @@ impl UsersServiceTrait for UsersService {
         }
 
         info!("creating password hash for user {:?}", email);
-        let hashed_password = self.security_service.hash_password(&password)?;
+        let hashed_password = self.argon_util.hash_password(&password)?;
 
         info!("password hashed successfully, creating user {:?}", email);
         let created_user = self
@@ -78,7 +78,7 @@ impl UsersServiceTrait for UsersService {
 
         info!("user successfully created, generating token");
         let token = self
-            .token_service
+            .token_util
             .new_access_token(created_user.id, &created_user.email)?;
 
         Ok(created_user.into_dto(token))
@@ -101,7 +101,7 @@ impl UsersServiceTrait for UsersService {
 
         info!("user found, verifying password hash for user {:?}", email);
         let is_valid_login_attempt = self
-            .security_service
+            .argon_util
             .verify_password(&user.password, attempted_password)?;
 
         if !is_valid_login_attempt {
@@ -110,7 +110,7 @@ impl UsersServiceTrait for UsersService {
         }
 
         info!("user login successful, generating token");
-        let token = self.token_service.new_access_token(user.id, &user.email)?;
+        let token = self.token_util.new_access_token(user.id, &user.email)?;
 
         Ok(user.into_dto(token))
     }
@@ -124,7 +124,7 @@ impl UsersServiceTrait for UsersService {
             user.email
         );
         let token = self
-            .token_service
+            .token_util
             .new_access_token(user.id, user.email.as_str())?;
 
         Ok(user.into_dto(token))
@@ -147,7 +147,7 @@ impl UsersServiceTrait for UsersService {
         // if the password is included on the request, hash it and update the stored password
         if request.password.is_some() && !request.password.as_ref().unwrap().is_empty() {
             updated_hashed_password = self
-                .security_service
+                .argon_util
                 .hash_password(request.password.unwrap().as_str())?;
         }
 
@@ -166,7 +166,7 @@ impl UsersServiceTrait for UsersService {
 
         info!("user {:?} updated, generating a new token", user_id);
         let token = self
-            .token_service
+            .token_util
             .new_access_token(user_id, updated_email.as_str())?;
 
         Ok(updated_user.into_dto(token))

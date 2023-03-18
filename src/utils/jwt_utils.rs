@@ -12,10 +12,10 @@ use super::errors::{AppError, AppResult};
 // use mockall::automock;
 
 /// A security service for handling JWT authentication.
-pub type DynJwtUtils = Arc<dyn JwtUtils + Send + Sync>;
+pub type DynJwtUtil = Arc<dyn JwtUtil + Send + Sync>;
 
 // #[automock]
-pub trait JwtUtils {
+pub trait JwtUtil {
     fn new_access_token(&self, user_id: i64, email: &str) -> AppResult<String>;
     fn new_refresh_token(&self, sub: i64) -> AppResult<String>;
     fn get_user_id_from_token(&self, token: String) -> AppResult<i64>;
@@ -36,17 +36,17 @@ struct RefreshTokenClaims {
     exp: usize,
 }
 
-pub struct JwtService {
+pub struct JwtTokenUtil {
     config: Arc<AppConfig>,
 }
 
-impl JwtService {
+impl JwtTokenUtil {
     pub fn new(config: Arc<AppConfig>) -> Self {
         Self { config }
     }
 }
 
-impl JwtUtils for JwtService {
+impl JwtUtil for JwtTokenUtil {
     fn new_access_token(&self, user_id: i64, email: &str) -> AppResult<String> {
         let from_now = Duration::from_secs(86400);
         let expired_future_time = SystemTime::now().add(from_now);
