@@ -21,7 +21,7 @@ pub type DynUsersService = Arc<dyn UsersServiceTrait + Send + Sync>;
 pub trait UsersServiceTrait {
     async fn signup_user(&self, request: SignUpUserDto) -> AppResult<ResponseUserDto>;
 
-    async fn signin_user(&self, request: SignInUserDto) -> AppResult<ResponseUserDto>;
+    async fn signin_user(&self, request: SignInUserDto) -> AppResult<(ResponseUserDto, String)>;
 
     async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto>;
 
@@ -84,7 +84,7 @@ impl UsersServiceTrait for UsersService {
         Ok(created_user.into_dto(token))
     }
 
-    async fn signin_user(&self, request: SignInUserDto) -> AppResult<ResponseUserDto> {
+    async fn signin_user(&self, request: SignInUserDto) -> AppResult<(ResponseUserDto, String)> {
         let email = request.email.unwrap();
         let attempted_password = request.password.unwrap();
 
@@ -110,9 +110,9 @@ impl UsersServiceTrait for UsersService {
         }
 
         info!("user login successful, generating token");
-        let token = self.token_util.new_access_token(user.id, &user.email)?;
+        let access_token = self.token_util.new_access_token(user.id, &user.email)?;
 
-        Ok(user.into_dto(token))
+        Ok((user.into_dto(access_token), "refresh_token".to_string()))
     }
 
     async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto> {

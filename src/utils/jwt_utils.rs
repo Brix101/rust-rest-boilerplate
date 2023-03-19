@@ -69,7 +69,7 @@ impl JwtUtil for JwtTokenUtil {
     }
 
     fn new_refresh_token(&self, sub: i64) -> AppResult<String> {
-        let from_now = Duration::from_secs(86400);
+        let from_now = Duration::from_secs(604800);
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
 

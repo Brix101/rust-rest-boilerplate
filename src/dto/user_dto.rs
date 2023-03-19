@@ -9,7 +9,7 @@ pub struct ResponseUserDto {
     pub email: String,
     pub bio: Option<String>,
     pub image: Option<String>,
-    pub token: String,
+    pub access_token: String,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -36,7 +36,7 @@ impl UserAuthenicationResponse {
                 email,
                 bio,
                 image,
-                token,
+                access_token: token,
             },
         }
     }
