@@ -9,7 +9,7 @@ pub struct ResponseUserDto {
     pub email: String,
     pub bio: Option<String>,
     pub image: Option<String>,
-    pub access_token: String,
+    pub access_token: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -27,7 +27,7 @@ impl UserAuthenicationResponse {
         // strings as `Option` option values for now
         bio: Option<String>,
         image: Option<String>,
-        token: String,
+        access_token: Option<String>,
     ) -> Self {
         UserAuthenicationResponse {
             user: ResponseUserDto {
@@ -36,7 +36,7 @@ impl UserAuthenicationResponse {
                 email,
                 bio,
                 image,
-                access_token: token,
+                access_token,
             },
         }
     }

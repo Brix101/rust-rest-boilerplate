@@ -56,7 +56,7 @@ impl UserEntity {
             name: self.name,
             bio: Some(self.bio),
             image: Some(self.image),
-            access_token: token,
+            access_token: Some(token),
         }
     }
 

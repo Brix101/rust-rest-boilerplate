@@ -5,7 +5,9 @@ use async_trait::async_trait;
 
 use crate::{
     dto::user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
-    repositories::user_repository::DynUsersRepository,
+    repositories::{
+        session_repository::DynSessionsRepository, user_repository::DynUsersRepository,
+    },
     utils::{
         argon_util::DynArgonUtil,
         errors::{AppError, AppResult},
@@ -36,19 +38,22 @@ pub trait UsersServiceTrait {
 pub struct UsersService {
     repository: DynUsersRepository,
     argon_util: DynArgonUtil,
-    token_util: DynJwtUtil,
+    jwt_util: DynJwtUtil,
+    session_repository: DynSessionsRepository,
 }
 
 impl UsersService {
     pub fn new(
         repository: DynUsersRepository,
-        security_service: DynArgonUtil,
-        token_service: DynJwtUtil,
+        argon_util: DynArgonUtil,
+        jwt_util: DynJwtUtil,
+        session_repository: DynSessionsRepository,
     ) -> Self {
         Self {
             repository,
-            argon_util: security_service,
-            token_util: token_service,
+            argon_util,
+            jwt_util,
+            session_repository,
         }
     }
 }
@@ -78,7 +83,7 @@ impl UsersServiceTrait for UsersService {
 
         info!("user successfully created, generating token");
         let token = self
-            .token_util
+            .jwt_util
             .new_access_token(created_user.id, &created_user.email)?;
 
         Ok(created_user.into_dto(token))
@@ -110,7 +115,8 @@ impl UsersServiceTrait for UsersService {
         }
 
         info!("user login successful, generating token");
-        let access_token = self.token_util.new_access_token(user.id, &user.email)?;
+        // let test = self.session_repository.c /
+        let access_token = self.jwt_util.new_access_token(user.id, &user.email)?;
 
         Ok((user.into_dto(access_token), "refresh_token".to_string()))
     }
@@ -124,7 +130,7 @@ impl UsersServiceTrait for UsersService {
             user.email
         );
         let token = self
-            .token_util
+            .jwt_util
             .new_access_token(user.id, user.email.as_str())?;
 
         Ok(user.into_dto(token))
@@ -166,7 +172,7 @@ impl UsersServiceTrait for UsersService {
 
         info!("user {:?} updated, generating a new token", user_id);
         let token = self
-            .token_util
+            .jwt_util
             .new_access_token(user_id, updated_email.as_str())?;
 
         Ok(updated_user.into_dto(token))

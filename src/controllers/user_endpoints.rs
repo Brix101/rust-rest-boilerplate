@@ -23,7 +23,7 @@ impl UsersRouter {
             .route("/user", get(UsersRouter::get_current_user_endpoint))
             .route("/user", put(UsersRouter::update_user_endpoint))
             .layer(Extension(service_register.users_service))
-            .layer(Extension(service_register.token_service))
+            .layer(Extension(service_register.jwt_util))
     }
 
     pub async fn signup_user_endpoint(
