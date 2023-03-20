@@ -4,6 +4,8 @@ use async_trait::async_trait;
 // use mockall::automock;
 use sqlx::{types::time::OffsetDateTime, FromRow};
 
+use crate::dto::session_dto::SessionResponseDto;
+
 use super::user_repository::UserEntity;
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
@@ -11,7 +13,7 @@ pub type DynSessionsRepository = Arc<dyn SessionsRepository + Send + Sync>;
 
 #[async_trait]
 pub trait SessionsRepository {
-    async fn create_session(
+    async fn new_session(
         &self,
         user_id: &i64,
         user_agent: &str,
@@ -27,6 +29,19 @@ pub struct SessionEntity {
     pub user_id: i64,
     pub exp: OffsetDateTime,
     pub user_agent: String,
+}
+
+impl SessionEntity {
+    pub fn new(self) -> SessionResponseDto {
+        SessionResponseDto {
+            access_token: "access_token".to_string(),
+            refresh_token: "refresh_token".to_string(),
+        }
+    }
+
+    pub fn new_access_token(self) -> String {
+        "access_token".to_string()
+    }
 }
 
 impl Default for SessionEntity {

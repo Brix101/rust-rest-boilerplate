@@ -4,16 +4,19 @@ use tracing::{error, info};
 use async_trait::async_trait;
 
 use crate::{
-    dto::user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
-    repositories::{
-        session_repository::DynSessionsRepository, user_repository::DynUsersRepository,
+    dto::{
+        session_dto::NewSessionDto,
+        user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
     },
+    repositories::user_repository::DynUsersRepository,
     utils::{
         argon_util::DynArgonUtil,
         errors::{AppError, AppResult},
         jwt_utils::DynJwtUtil,
     },
 };
+
+use super::session_service::DynSessionsService;
 
 /// A reference counter for our user service allows us safely pass instances user utils
 /// around which themselves depend on the user repostiory, and ultimately, our Posgres connection pool.
@@ -39,7 +42,7 @@ pub struct UsersService {
     repository: DynUsersRepository,
     argon_util: DynArgonUtil,
     jwt_util: DynJwtUtil,
-    session_repository: DynSessionsRepository,
+    session_service: DynSessionsService,
 }
 
 impl UsersService {
@@ -47,13 +50,13 @@ impl UsersService {
         repository: DynUsersRepository,
         argon_util: DynArgonUtil,
         jwt_util: DynJwtUtil,
-        session_repository: DynSessionsRepository,
+        session_service: DynSessionsService,
     ) -> Self {
         Self {
             repository,
             argon_util,
             jwt_util,
-            session_repository,
+            session_service,
         }
     }
 }
@@ -116,9 +119,17 @@ impl UsersServiceTrait for UsersService {
 
         info!("user login successful, generating token");
         // let test = self.session_repository.c /
-        let access_token = self.jwt_util.new_access_token(user.id, &user.email)?;
 
-        Ok((user.into_dto(access_token), "refresh_token".to_string()))
+        let token = self
+            .session_service
+            .new_session(NewSessionDto {
+                user_id: Some(user.id),
+                user_agent: Some("test".to_string()),
+            })
+            .await
+            .unwrap();
+
+        Ok((user.into_dto(token.access_token), token.refresh_token))
     }
 
     async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto> {

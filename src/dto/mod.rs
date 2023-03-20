@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+pub mod session_dto;
 pub mod user_dto;
 
 #[derive(Debug, Deserialize, Serialize)]

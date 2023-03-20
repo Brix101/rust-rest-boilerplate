@@ -81,7 +81,7 @@ impl JwtUtil for JwtTokenUtil {
         let token = encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(self.config.access_token_secret.as_bytes()),
+            &EncodingKey::from_secret(self.config.refresh_token_secret.as_bytes()),
         )
         .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
 

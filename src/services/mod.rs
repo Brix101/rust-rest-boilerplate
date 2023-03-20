@@ -6,10 +6,9 @@ use crate::{
     config::AppConfig,
     queries::{session_query::SessionsQuery, user_query::UsersQuery},
     repositories::{
-        session_repository::{self, DynSessionsRepository, SessionsRepository},
-        user_repository::DynUsersRepository,
+        session_repository::DynSessionsRepository, user_repository::DynUsersRepository,
     },
-    services::user_service::UsersService,
+    services::{session_service::SessionsService, user_service::UsersService},
     utils::{
         argon_util::{ArgonSecurityUtil, DynArgonUtil},
         connection_pool::ConnectionPool,
@@ -17,14 +16,16 @@ use crate::{
     },
 };
 
-use self::user_service::DynUsersService;
+use self::{session_service::DynSessionsService, user_service::DynUsersService};
 
+pub mod session_service;
 pub mod user_service;
 
 #[derive(Clone)]
 pub struct ServiceRegister {
     pub users_service: DynUsersService,
     pub jwt_util: DynJwtUtil,
+    pub sessions_service: DynSessionsService,
 }
 
 impl ServiceRegister {
@@ -39,16 +40,22 @@ impl ServiceRegister {
         let session_repository =
             Arc::new(SessionsQuery::new(pool.clone())) as DynSessionsRepository;
 
+        let sessions_service = Arc::new(SessionsService::new(
+            session_repository.clone(),
+            jwt_util.clone(),
+        )) as DynSessionsService;
+
         let users_service = Arc::new(UsersService::new(
             users_repository.clone(),
             security_service,
             jwt_util.clone(),
-            session_repository.clone(),
+            sessions_service.clone(),
         )) as DynUsersService;
 
         ServiceRegister {
             users_service,
             jwt_util,
+            sessions_service,
         }
     }
 }

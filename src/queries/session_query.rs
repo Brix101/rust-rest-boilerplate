@@ -20,7 +20,7 @@ impl SessionsQuery {
 
 #[async_trait]
 impl SessionsRepository for SessionsQuery {
-    async fn create_session(
+    async fn new_session(
         &self,
         user_id: &i64,
         user_agent: &str,
