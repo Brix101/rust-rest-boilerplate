@@ -2,22 +2,17 @@ use lazy_static::lazy_static;
 use tracing::info;
 
 use crate::{
-    database::{budget::repository::PlanType, category::repository::CategoryType},
+    database::category::repository::CategoryType,
     server::{
         dtos::{
-            budget_dto::BudgetCreateDto,
             category_dto::CategoryCreateDto,
-            expense_dto::ExpenseCreateDto,
             user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto},
         },
         error::AppResult,
     },
 };
 
-use super::{
-    budget_services::DynBudgetsService, category_services::DynCategoriesService,
-    expense_services::DynExpensesService, user_services::DynUsersService, Services,
-};
+use super::{category_services::DynCategoriesService, user_services::DynUsersService, Services};
 
 lazy_static! {
     static ref TEST_USER_1_NAME: &'static str = "testuser1";
@@ -34,8 +29,6 @@ lazy_static! {
 pub struct SeedService {
     user_services: DynUsersService,
     category_services: DynCategoriesService,
-    budget_services: DynBudgetsService,
-    expense_services: DynExpensesService,
 }
 
 impl SeedService {
@@ -43,8 +36,6 @@ impl SeedService {
         Self {
             user_services: services.users,
             category_services: services.categories,
-            budget_services: services.budgets,
-            expense_services: services.expenses,
         }
     }
 
@@ -84,8 +75,7 @@ impl SeedService {
         let created_users = vec![created_user_1, created_user_2, created_user_3];
         for user in created_users.iter() {
             for index in 1..5 {
-                let created_category = self
-                    .category_services
+                self.category_services
                     .create_category(
                         user.id,
                         CategoryCreateDto {
@@ -93,29 +83,6 @@ impl SeedService {
                             cat_type: CategoryType::NonEssential,
                         },
                     )
-                    .await?;
-
-                self.budget_services
-                    .create_budget(BudgetCreateDto {
-                        category_id: Some(created_category.id),
-                        amount: Some(500_f64),
-                        description: Some(format!(
-                            "{:?} budget for category {:?}",
-                            user.name, index
-                        )),
-                        plan: Some(PlanType::Monthly),
-                    })
-                    .await?;
-
-                self.expense_services
-                    .create_expense(ExpenseCreateDto {
-                        category_id: Some(created_category.id),
-                        amount: Some(500_f64),
-                        description: Some(format!(
-                            "{:?} expense for category {:?}",
-                            user.name, index
-                        )),
-                    })
                     .await?;
             }
         }

@@ -7,8 +7,7 @@ use crate::{
     database::Database,
     server::{
         services::{
-            budget_services::BudgetsService, category_services::CategoriesService,
-            expense_services::ExpensesService, session_services::SessionsService,
+            category_services::CategoriesService, session_services::SessionsService,
             user_services::UsersService,
         },
         utils::{
@@ -19,16 +18,13 @@ use crate::{
 };
 
 use self::{
-    budget_services::DynBudgetsService, category_services::DynCategoriesService,
-    expense_services::DynExpensesService, session_services::DynSessionsService,
+    category_services::DynCategoriesService, session_services::DynSessionsService,
     user_services::DynUsersService,
 };
 
 use super::utils::jwt_utils::DynJwtUtil;
 
-pub mod budget_services;
 pub mod category_services;
-pub mod expense_services;
 pub mod seed_services;
 pub mod session_services;
 pub mod user_services;
@@ -38,9 +34,7 @@ pub struct Services {
     pub jwt_util: DynJwtUtil,
     pub users: DynUsersService,
     pub sessions: DynSessionsService,
-    pub budgets: DynBudgetsService,
     pub categories: DynCategoriesService,
-    pub expenses: DynExpensesService,
 }
 
 impl Services {
@@ -65,17 +59,11 @@ impl Services {
         let categories =
             Arc::new(CategoriesService::new(repository.clone())) as DynCategoriesService;
 
-        let budgets = Arc::new(BudgetsService::new(repository.clone())) as DynBudgetsService;
-
-        let expenses = Arc::new(ExpensesService::new(repository.clone())) as DynExpensesService;
-
         Self {
             jwt_util,
             users,
             sessions,
-            budgets,
             categories,
-            expenses,
         }
     }
 }
