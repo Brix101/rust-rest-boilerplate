@@ -20,4 +20,7 @@ pub struct AppConfig {
 
     #[clap(long, env)]
     pub cors_origin: String,
+
+    #[clap(long, env)]
+    pub seed: bool,
 }

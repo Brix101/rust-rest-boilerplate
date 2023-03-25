@@ -1,12 +1,214 @@
 {
   "db": "PostgreSQL",
+  "025a707a290da95645e80d4ebdf67b2b168fda35cb7dc350bdbf9fff737cffc1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "plan: PlanType",
+          "ordinal": 4,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select id, amount, description, category_id, plan as \"plan: PlanType\", created_at, updated_at, deleted_at\n        from budgets\n        where id = $1\n            "
+  },
+  "02de65a711b78f1487359145698c8c7aa598fd6d55e11d4cf146225fd2f842c9": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "plan: PlanType",
+          "ordinal": 4,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select budgets.id, budgets.amount, budgets.description, budgets.category_id, budgets.plan as \"plan: PlanType\",\n        budgets.created_at, budgets.updated_at, budgets.deleted_at\n        from budgets\n        inner join categories on categories.id = budgets.id\n        where categories.user_id = $1\n            "
+  },
+  "26e164f9409158d744da628d72fd9892f514ef0895d154c3935bd3ef8fc707ed": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select expenses.*\n        from expenses\n        inner join categories on expenses.category_id=categories.id\n        where categories.user_id = $1\n            "
+  },
   "2cf1f6d9811d9213a0e640e1d97197d262c0024c27df6f5730aa02f7f6f01640": {
     "describe": {
       "columns": [
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Uuid"
         },
         {
           "name": "name",
@@ -62,19 +264,87 @@
       ],
       "parameters": {
         "Left": [
-          "Int8"
+          "Uuid"
         ]
       }
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
   },
-  "43bbeb7d4ed2e97cafba890f15976ecf04a8576047e5af495165541c3cbb9986": {
+  "3a6b59ec5172e666285b00f2fcf4ecc7d4ca8ddd2805f30c5afa5723c2753512": {
     "describe": {
       "columns": [
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "password",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "bio",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "image",
+          "ordinal": 5,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select users.* from users\n        inner join sessions\n        on users.id = sessions.user_id\n        where sessions.exp >= now() and sessions.id = $1\n            "
+  },
+  "3bc1cf61850e5bcf9d7a2a3fcd8cf9caf289913c30d1044c1b23e449e6f12b78": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
         },
         {
           "name": "exp",
@@ -84,7 +354,7 @@
         {
           "name": "user_id",
           "ordinal": 2,
-          "type_info": "Int8"
+          "type_info": "Uuid"
         },
         {
           "name": "user_agent",
@@ -100,13 +370,157 @@
       ],
       "parameters": {
         "Left": [
-          "Int8",
+          "Uuid",
           "Varchar",
           "Timestamptz"
         ]
       }
     },
-    "query": "\n        insert into user_sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
+    "query": "\n        insert into sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
+  },
+  "3ccad41666b7b5180d36e2f3a37ac3ffe91e1f01bb5f2c945c258c0eef8a09a3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "cat_type: CategoryType",
+          "ordinal": 2,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Essential",
+                  "NonEssential"
+                ]
+              },
+              "name": "category_type"
+            }
+          }
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select categories.id, categories.name, categories.cat_type as \"cat_type: CategoryType\",\n        categories.user_id, categories.created_at, categories.updated_at, categories.deleted_at\n        from categories\n        inner join users on categories.user_id=users.id\n        where users.id = $1\n            "
+  },
+  "4a9f69b7862ef05bf4c272bc6ae01c958ec60c301dd1affd0b0002486ed208db": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "cat_type: CategoryType",
+          "ordinal": 2,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Essential",
+                  "NonEssential"
+                ]
+              },
+              "name": "category_type"
+            }
+          }
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Uuid",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Essential",
+                  "NonEssential"
+                ]
+              },
+              "name": "category_type"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n        insert into categories (created_at, updated_at, name, user_id,cat_type)\n        values (current_timestamp, current_timestamp, $1::varchar, $2, $3)\n        returning id, name, cat_type as \"cat_type: CategoryType\", user_id, created_at, updated_at, deleted_at\n            "
   },
   "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
     "describe": {
@@ -114,7 +528,7 @@
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Uuid"
         },
         {
           "name": "name",
@@ -175,11 +589,99 @@
           "Varchar",
           "Varchar",
           "Varchar",
-          "Int8"
+          "Uuid"
         ]
       }
     },
     "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            bio = $4::varchar,\n            image = $5::varchar,\n            updated_at = current_timestamp\n        where id = $6\n        returning *\n            "
+  },
+  "769236adc60101dab3b04ee18918f6755e02364ab949bd4d784963abd29f3b3d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "plan: PlanType",
+          "ordinal": 4,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Float8",
+          "Varchar",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          },
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update budgets\n        set\n            category_id = $1,\n            amount = $2::float,\n            description = $3::varchar,\n            plan = $4,\n            updated_at = current_timestamp\n        where id = $5\n        returning id, amount, description, category_id, plan as \"plan: PlanType\", created_at, updated_at, deleted_at\n            "
   },
   "7806f4fd33c1168dfe2ce2873a1bfb92cca0ffd792ed71455cd722361c6ce3b3": {
     "describe": {
@@ -187,7 +689,7 @@
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Uuid"
         },
         {
           "name": "name",
@@ -251,13 +753,84 @@
     },
     "query": "\n        insert into users (created_at, updated_at, name, email, password, bio, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '', '')\n        returning *\n            "
   },
-  "a1f2a6a5f0b3bf75267d257217cd496e3b7ecad2fcf36fe7dfaa7f8873a699d0": {
+  "85a043a304f3a5db33e9dacc51c3dfb9e7beb4fddf483624fa151c347d14dad3": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        delete from budgets\n        where id = $1\n        "
+  },
+  "972712a50aefb8e517fe7ead5246b485822921950203390b353531ad7cd2d051": {
     "describe": {
       "columns": [
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Float8",
+          "Varchar",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update expenses\n        set\n            category_id = $1,\n            amount = $2::float,\n            description = $3::varchar,\n            updated_at = current_timestamp\n        where id = $4\n        returning *\n            "
+  },
+  "9eb8d8778cc34e78e868cea1e113ed84669f0eb0179c55d0d55959ac99c191ee": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
         },
         {
           "name": "name",
@@ -265,38 +838,202 @@
           "type_info": "Varchar"
         },
         {
-          "name": "email",
+          "name": "cat_type: CategoryType",
           "ordinal": 2,
-          "type_info": "Varchar"
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Essential",
+                  "NonEssential"
+                ]
+              },
+              "name": "category_type"
+            }
+          }
         },
         {
-          "name": "password",
+          "name": "user_id",
           "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "bio",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "image",
-          "ordinal": 5,
-          "type_info": "Varchar"
+          "type_info": "Uuid"
         },
         {
           "name": "created_at",
-          "ordinal": 6,
+          "ordinal": 4,
           "type_info": "Timestamptz"
         },
         {
           "name": "updated_at",
-          "ordinal": 7,
+          "ordinal": 5,
           "type_info": "Timestamptz"
         },
         {
           "name": "deleted_at",
-          "ordinal": 8,
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Essential",
+                  "NonEssential"
+                ]
+              },
+              "name": "category_type"
+            }
+          },
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update categories\n        set\n            name = $1::varchar,\n            cat_type = $2\n        where id = $3\n        returning id, name, cat_type as \"cat_type: CategoryType\", user_id, created_at, updated_at, deleted_at\n            "
+  },
+  "a647e6a19214f74149df1a013b4d49ad719496be88b52e6b3690d6ca66c0a798": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select *\n        from expenses\n        where id = $1\n            "
+  },
+  "a7795f99e4f41ce866cadd0843e547360670fa7152c6ee201fb8feca9896d8b4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        delete from categories\n        where id = $1\n        "
+  },
+  "af4b93215fe76d5c57629372c2732e755418b3f09601cc2c227d954ef115fb2b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        delete from expenses\n        where id = $1\n        "
+  },
+  "b47a72459991771b952a2830ee614286cf16c4a95f8a016df868138897f804f0": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "plan: PlanType",
+          "ordinal": 4,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
           "type_info": "Timestamptz"
         }
       ],
@@ -308,16 +1045,153 @@
         false,
         false,
         false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Float8",
+          "Varchar",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n        insert into budgets (created_at, updated_at, category_id, amount, description,plan)\n        values (current_timestamp, current_timestamp, $1, $2::float, $3::varchar, $4)\n        returning id, amount, description, category_id, plan as \"plan: PlanType\", created_at, updated_at, deleted_at\n            "
+  },
+  "b74fbdcd05eeaf7d2fcc2595d9f6b84549d5603ed0f79eb48e1be46e64e17c15": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
         false,
         true
       ],
       "parameters": {
         "Left": [
-          "Int8"
+          "Uuid",
+          "Float8",
+          "Varchar"
         ]
       }
     },
-    "query": "\n        select users.* from users\n        inner join user_sessions\n        on users.id = user_sessions.user_id\n        where user_sessions.id = $1\n            "
+    "query": "\n        insert into expenses (created_at, updated_at, category_id, amount, description)\n        values (current_timestamp, current_timestamp, $1, $2::float, $3::varchar)\n        returning *\n            "
+  },
+  "dc2228fbbb320cc8957c675143393f6785223ddc01d0b951f015e065bedeb9cb": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "cat_type: CategoryType",
+          "ordinal": 2,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Essential",
+                  "NonEssential"
+                ]
+              },
+              "name": "category_type"
+            }
+          }
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select id, name, cat_type as \"cat_type: CategoryType\", user_id, created_at, updated_at, deleted_at\n        from categories\n        where id = $1\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {
@@ -325,7 +1199,7 @@
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Uuid"
         },
         {
           "name": "name",
