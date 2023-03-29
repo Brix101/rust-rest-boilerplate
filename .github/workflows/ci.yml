@@ -12,18 +12,55 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  test:
+
     runs-on: ubuntu-latest
-
+        
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: password
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:password@localhost/db
+      HMAC_KEY: 2b6c3e9caa0215a0c05c9b220479a4d30c7099233f66f862382945c17b6b607f2ef5efdb0229134692210905b0ebdc19
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3.5.0
-
-      - name: Install rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install cargo-make
-        run: cargo install --debug cargo-make
-
-      - name: Run CI
-        run: cargo make ci
+    - uses: actions/checkout@v3
+    - name: Setup Database
+      run: |
+        cargo install sqlx-cli --features postgres
+        sqlx db setup
+    - name: Build
+      run: cargo build --verbose
+    - name: Run unit tests
+      run: cargo test --verbose
+    # - name: Checkout Realworld Repo
+    #   uses: actions/checkout@v3
+    #   with:
+    #     repository: abonander/realworld
+    #     # FIXME: we actually require this PR for the tests to pass: https://github.com/gothinkster/realworld/pull/490
+    #     # At the time of writing, #490 has a bug that hardcodes `APIURL` so it's not useful for testing here.
+    #     # For now, this is actually my (@abonander) fork of that fork, with that bug fixed.
+    #     ref: ccb6ab8aa4b10397cbfa4262e64fc5a306d63cb2
+    #     path: realworld
+    # - name: Run Realworld Postman collection
+    #   env:
+    #     APIURL: http://localhost:8080/api
+    #   run: |
+    #     cargo run&
+    #     sleep 5
+    #     cd realworld/api
+    #     ./run-api-tests.sh
