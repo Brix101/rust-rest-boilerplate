@@ -21,7 +21,7 @@ jobs:
     steps:
       # checkout the repository and install a rust toolchain so we can run cargo commands
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.5.0
 
       - name: Install rust toolchain
         uses: dtolnay/rust-toolchain@stable
