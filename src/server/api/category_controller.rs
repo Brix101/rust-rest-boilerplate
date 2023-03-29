@@ -11,9 +11,9 @@ use crate::server::error::AppResult;
 use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
 use crate::server::services::Services;
 
-pub struct CategoryRouter;
+pub struct CategoryController;
 
-impl CategoryRouter {
+impl CategoryController {
     pub fn app() -> Router {
         Router::new()
             .route("/", get(Self::get_user_categories))

@@ -13,9 +13,9 @@ use crate::server::middlewares::{
 };
 use crate::server::services::Services;
 
-pub struct UsersRouter;
+pub struct UserController;
 
-impl UsersRouter {
+impl UserController {
     pub fn app() -> Router {
         Router::new()
             .route("/signup", post(Self::signup_user_endpoint))

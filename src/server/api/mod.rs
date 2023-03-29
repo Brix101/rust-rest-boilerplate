@@ -1,10 +1,9 @@
-mod category_api;
-mod user_api;
+mod category_controller;
+mod user_controller;
 
 use axum::routing::*;
 
-use category_api::CategoryRouter;
-use user_api::UsersRouter;
+use self::{category_controller::CategoryController, user_controller::UserController};
 
 pub async fn health() -> &'static str {
     "🚀🚀🚀 Server Running"
@@ -12,7 +11,7 @@ pub async fn health() -> &'static str {
 
 pub fn app() -> Router {
     Router::new()
-        .nest("/users", UsersRouter::app())
-        .nest("/categories", CategoryRouter::app())
+        .nest("/users", UserController::app())
+        .nest("/categories", CategoryController::app())
         .route("/health", get(health))
 }
