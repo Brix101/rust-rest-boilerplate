@@ -159,8 +159,6 @@ impl UsersServiceTrait for UsersService {
 
         let updated_email = request.email.unwrap_or(user.email);
         let updated_name = request.name.unwrap_or(user.name);
-        let updated_bio = request.bio.unwrap_or(user.bio);
-        let updated_image = request.image.unwrap_or(user.image);
         let mut updated_hashed_password = user.password;
 
         // if the password is included on the request, hash it and update the stored password
@@ -182,8 +180,6 @@ impl UsersServiceTrait for UsersService {
                 updated_email.clone(),
                 updated_name,
                 updated_hashed_password,
-                updated_bio,
-                updated_image,
             )
             .await?;
 

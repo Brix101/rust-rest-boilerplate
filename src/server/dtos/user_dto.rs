@@ -10,18 +10,7 @@ impl User {
             id: self.id,
             email: self.email,
             name: self.name,
-            bio: Some(self.bio),
-            image: Some(self.image),
             access_token: Some(token),
-        }
-    }
-
-    pub fn into_profile(self, following: bool) -> UserProfileDto {
-        UserProfileDto {
-            name: self.name,
-            bio: self.bio,
-            image: self.image,
-            following,
         }
     }
 }
@@ -32,8 +21,6 @@ pub struct ResponseUserDto {
     pub id: Uuid,
     pub name: String,
     pub email: String,
-    pub bio: Option<String>,
-    pub image: Option<String>,
     pub access_token: Option<String>,
 }
 
@@ -50,8 +37,6 @@ impl UserAuthenicationResponse {
         // unfortunately, while our implementation returns thes optional fields as empty strings,
         // the realworld demo API enables nullable serializing by default, so we have to wrap these
         // strings as `Option` option values for now
-        bio: Option<String>,
-        image: Option<String>,
         access_token: Option<String>,
     ) -> Self {
         UserAuthenicationResponse {
@@ -59,8 +44,6 @@ impl UserAuthenicationResponse {
                 id,
                 name,
                 email,
-                bio,
-                image,
                 access_token,
             },
         }

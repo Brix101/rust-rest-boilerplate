@@ -18,8 +18,8 @@ impl UsersRepository for Database {
         query_as!(
             User,
             r#"
-        insert into users (created_at, updated_at, name, email, password, bio, image)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '', '')
+        insert into users (created_at, updated_at, name, email, password)
+        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar)
         returning *
             "#,
             name,
@@ -67,8 +67,6 @@ impl UsersRepository for Database {
         email: String,
         name: String,
         password: String,
-        bio: String,
-        image: String,
     ) -> anyhow::Result<User> {
         query_as!(
             User,
@@ -78,17 +76,13 @@ impl UsersRepository for Database {
             name = $1::varchar,
             email = $2::varchar,
             password = $3::varchar,
-            bio = $4::varchar,
-            image = $5::varchar,
             updated_at = current_timestamp
-        where id = $6
+        where id = $4
         returning *
             "#,
             name,
             email,
             password,
-            bio,
-            image,
             id
         )
         .fetch_one(&self.pool)

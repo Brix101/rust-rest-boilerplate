@@ -12,8 +12,7 @@ create table if not exists categories
     cat_type        category_type not null default 'NonEssential',
     user_id     uuid      not null references users (id) on delete cascade,
     created_at  timestamptz not null default current_timestamp,
-    updated_at  timestamptz not null default current_timestamp,
-    deleted_at  timestamptz default null
+    updated_at  timestamptz not null default current_timestamp
 );
 
 alter table categories

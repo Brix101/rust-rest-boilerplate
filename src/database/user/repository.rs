@@ -32,8 +32,6 @@ pub trait UsersRepository {
         email: String,
         name: String,
         password: String,
-        bio: String,
-        image: String,
     ) -> anyhow::Result<User>;
 }
 
@@ -43,25 +41,19 @@ pub struct User {
     pub name: String,
     pub email: String,
     pub password: String,
-    pub bio: String,
-    pub image: String,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
-    pub deleted_at: Option<OffsetDateTime>,
 }
 
 impl Default for User {
     fn default() -> Self {
         User {
             id: uuid!("f3f898aa-ffa3-4b58-91b0-612a1c801a5e"),
-            bio: String::from("stub bio"),
             email: String::from("stub email"),
             name: String::from("stub name"),
             password: String::from("hashed password"),
-            image: String::from("stub image"),
             created_at: OffsetDateTime::from(SystemTime::now()),
             updated_at: OffsetDateTime::from(SystemTime::now()),
-            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
         }
     }
 }

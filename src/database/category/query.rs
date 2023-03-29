@@ -20,7 +20,7 @@ impl CategoriesRepository for Database {
             r#"
         insert into categories (created_at, updated_at, name, user_id,cat_type)
         values (current_timestamp, current_timestamp, $1::varchar, $2, $3)
-        returning id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at, deleted_at
+        returning id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at
             "#,
             name,
             user_id,
@@ -35,7 +35,7 @@ impl CategoriesRepository for Database {
         query_as!(
             Category,
             r#"
-        select id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at, deleted_at
+        select id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at
         from categories
         where id = $1
             "#,
@@ -51,7 +51,7 @@ impl CategoriesRepository for Database {
             Category,
             r#"
         select categories.id, categories.name, categories.cat_type as "cat_type: CategoryType",
-        categories.user_id, categories.created_at, categories.updated_at, categories.deleted_at
+        categories.user_id, categories.created_at, categories.updated_at
         from categories
         inner join users on categories.user_id=users.id
         where users.id = $1
@@ -77,7 +77,7 @@ impl CategoriesRepository for Database {
             name = $1::varchar,
             cat_type = $2
         where id = $3
-        returning id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at, deleted_at
+        returning id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at
             "#,
             name,
             cat_type as _,

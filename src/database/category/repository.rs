@@ -57,7 +57,6 @@ pub struct Category {
     pub user_id: Uuid,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
-    pub deleted_at: Option<OffsetDateTime>,
 }
 
 impl Default for Category {
@@ -69,7 +68,6 @@ impl Default for Category {
             user_id: uuid!("f3f898aa-ffa3-4b58-91b0-612a1c801a5e"),
             created_at: OffsetDateTime::from(SystemTime::now()),
             updated_at: OffsetDateTime::from(SystemTime::now()),
-            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
         }
     }
 }
