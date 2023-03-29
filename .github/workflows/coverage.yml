@@ -1,0 +1,38 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+      - "main"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: coverage
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: xd009642/tarpaulin:develop-nightly
+      options: --security-opt seccomp=unconfined
+
+    steps:
+      # checkout the repository and install a rust toolchain so we can run cargo commands
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-make
+        run: cargo install --debug cargo-make
+
+      - name: Generate code coverage
+        run: cargo make ci-coverage
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
