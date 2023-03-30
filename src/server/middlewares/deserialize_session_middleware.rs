@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::server::error::Error;
 use crate::server::services::Services;
 
-/// Extracts the JWT from the Authorization token header.
+/// Extracts the JWT from the cookie token header.
 pub struct DeserializeSession(pub Uuid, pub String);
 
 #[async_trait]

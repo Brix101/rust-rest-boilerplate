@@ -9,6 +9,7 @@ use validator::Validate;
 
 use crate::server::error::Error;
 
+/// Validate User Request.
 pub struct ValidatedRequest<T>(pub T);
 
 #[async_trait]

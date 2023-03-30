@@ -5,6 +5,7 @@ use axum::http::request::Parts;
 
 use crate::server::error::Error;
 
+/// Extracts the JWT from the cookie token header.
 pub struct UserAgent(pub Option<String>);
 
 #[async_trait]
