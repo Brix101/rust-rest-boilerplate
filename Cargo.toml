@@ -1,5 +1,5 @@
 [package]
-name = "budgetto_api"
+name = "axum-sqlx-rest-api-with-jwt"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,7 +9,7 @@ edition = "2021"
 anyhow = "1.0.69"
 async-trait = "0.1.66"
 axum = { version = "0.6.10", features = ["tower-log"] }
-axum-extra = { version = "0.7.1", features = ["cookie", "cookie-signed"] }
+axum-extra = { version = "0.7.1", features = ["cookie"] }
 backtrace = "0.3.67"
 clap = { version = "4.1.8", features = ["derive","env"] }
 dotenvy = "0.15.6"
