@@ -59,8 +59,7 @@ impl UserController {
     }
 
     pub async fn get_current_user_endpoint(
-        Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(user_id, services): RequiredAuthentication,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to retrieve current user");
 
@@ -70,8 +69,7 @@ impl UserController {
     }
 
     pub async fn update_user_endpoint(
-        Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(user_id, services): RequiredAuthentication,
         Json(request): Json<UpdateUserDto>,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to update user {:?}", user_id);

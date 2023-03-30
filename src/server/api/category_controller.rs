@@ -1,6 +1,6 @@
 use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
-use axum::{Extension, Router};
+use axum::Router;
 use tracing::info;
 use uuid::Uuid;
 
@@ -9,7 +9,6 @@ use crate::server::dtos::category_dto::{
 };
 use crate::server::error::AppResult;
 use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
-use crate::server::services::Services;
 
 pub struct CategoryController;
 
@@ -24,8 +23,7 @@ impl CategoryController {
 
     pub async fn get_user_categories(
         query_params: Query<CategoryQuery>,
-        Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(user_id, services): RequiredAuthentication,
     ) -> AppResult<Json<Vec<CategoryResponseDto>>> {
         info!("received request to get current user categorys");
 
@@ -42,8 +40,7 @@ impl CategoryController {
     }
 
     pub async fn create_category(
-        Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(user_id, services): RequiredAuthentication,
         ValidatedRequest(request): ValidatedRequest<CategoryCreateDto>,
     ) -> AppResult<Json<CategoryResponseDto>> {
         info!("received request to create category");
@@ -58,8 +55,7 @@ impl CategoryController {
 
     pub async fn update_category(
         Path(id): Path<Uuid>,
-        Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(user_id, services): RequiredAuthentication,
         Json(request): Json<CategoryUpdateDto>,
     ) -> AppResult<Json<CategoryResponseDto>> {
         info!("recieved request to update category {:?}", id);
@@ -74,8 +70,7 @@ impl CategoryController {
 
     pub async fn delete_category(
         Path(id): Path<Uuid>,
-        Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(user_id, services): RequiredAuthentication,
     ) -> AppResult<()> {
         info!("recieved request to remove category {:?}", id);
 
