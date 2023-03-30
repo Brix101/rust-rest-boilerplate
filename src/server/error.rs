@@ -109,7 +109,7 @@ impl Error {
         }
 
         let body = Json(json!({
-            "error": validation_errors,
+            "errors": validation_errors,
         }));
 
         (StatusCode::BAD_REQUEST, body).into_response()
