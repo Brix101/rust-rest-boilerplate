@@ -28,6 +28,7 @@ struct AccessTokenClaims {
     sub: String,
     user_id: Uuid,
     exp: usize,
+    iat: usize,
 }
 
 /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
@@ -35,6 +36,7 @@ struct AccessTokenClaims {
 struct RefreshTokenClaims {
     sub: Uuid,
     exp: usize,
+    iat: usize,
 }
 
 pub struct JwtTokenUtil {
@@ -49,13 +51,15 @@ impl JwtTokenUtil {
 
 impl JwtUtil for JwtTokenUtil {
     fn new_access_token(&self, user_id: Uuid, email: &str) -> AppResult<String> {
-        let from_now = Duration::from_secs(86400);
+        let from_now = Duration::from_secs(3600); //? expires every 15 min
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
+        let now = OffsetDateTime::now_utc();
 
         let claims = AccessTokenClaims {
             sub: String::from(email),
             exp: exp.unix_timestamp() as usize,
+            iat: now.unix_timestamp() as usize,
             user_id,
         };
 
@@ -70,13 +74,16 @@ impl JwtUtil for JwtTokenUtil {
     }
 
     fn new_refresh_token(&self, sub: Uuid) -> AppResult<String> {
-        let from_now = Duration::from_secs(604800);
+        let exp_time = 60 * 60 * 24 * 7 * 4; // expires in 1 month
+        let from_now = Duration::from_secs(exp_time);
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
+        let now = OffsetDateTime::now_utc();
 
         let claims = RefreshTokenClaims {
             sub,
             exp: exp.unix_timestamp() as usize,
+            iat: now.unix_timestamp() as usize,
         };
 
         let token = encode(
