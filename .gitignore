@@ -15,3 +15,6 @@ Cargo.lock
 /target
 
 .env
+
+logs/*
+!logs/.gitkeep
