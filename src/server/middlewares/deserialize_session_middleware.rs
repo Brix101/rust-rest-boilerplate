@@ -1,9 +1,9 @@
 use async_trait::async_trait;
 use axum::extract::FromRequestParts;
+use axum::http::header::COOKIE;
 use axum::http::request::Parts;
 use axum::Extension;
 use axum_extra::extract::cookie::Cookie;
-use http::header::COOKIE;
 use tracing::error;
 use uuid::Uuid;
 

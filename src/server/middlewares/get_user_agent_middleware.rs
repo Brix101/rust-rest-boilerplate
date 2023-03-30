@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use axum::extract::FromRequestParts;
+use axum::http::header::USER_AGENT;
 use axum::http::request::Parts;
-use http::header::USER_AGENT;
 
 use crate::server::error::Error;
 

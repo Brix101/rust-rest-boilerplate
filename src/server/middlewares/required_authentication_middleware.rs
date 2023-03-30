@@ -1,8 +1,8 @@
 use async_trait::async_trait;
 use axum::extract::FromRequestParts;
+use axum::http::header::AUTHORIZATION;
 use axum::http::request::Parts;
 use axum::Extension;
-use http::header::AUTHORIZATION;
 use tracing::error;
 use uuid::Uuid;
 

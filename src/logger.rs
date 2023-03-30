@@ -11,67 +11,72 @@ const MAX_LEVEL: LevelFilter = LevelFilter::DEBUG;
 // const MAX_LEVEL: LevelFilter = LevelFilter::INFO;
 
 /// Initialize logger (tracing and panic hook).
-pub fn init() {
-    tracing_subscriber::fmt().with_max_level(MAX_LEVEL).init();
+///
+pub struct Logger {}
 
-    // catch panic and log them using tracing instead of default output to StdErr
-    panic::set_hook(Box::new(|info| {
-        let thread = thread::current();
-        let thread = thread.name().unwrap_or("unknown");
+impl Logger {
+    pub fn init() {
+        tracing_subscriber::fmt().with_max_level(MAX_LEVEL).init();
 
-        let msg = match info.payload().downcast_ref::<&'static str>() {
-            Some(s) => *s,
-            None => match info.payload().downcast_ref::<String>() {
-                Some(s) => &**s,
-                None => "Box<Any>",
-            },
-        };
+        // catch panic and log them using tracing instead of default output to StdErr
+        panic::set_hook(Box::new(|info| {
+            let thread = thread::current();
+            let thread = thread.name().unwrap_or("unknown");
 
-        let backtrace = backtrace::Backtrace::new();
+            let msg = match info.payload().downcast_ref::<&'static str>() {
+                Some(s) => *s,
+                None => match info.payload().downcast_ref::<String>() {
+                    Some(s) => &**s,
+                    None => "Box<Any>",
+                },
+            };
 
-        match info.location() {
-            Some(location) => {
-                // without backtrace
-                if msg.starts_with("notrace - ") {
-                    error!(
-                        target: "panic", "thread '{}' panicked at '{}': {}:{}",
-                        thread,
-                        msg.replace("notrace - ", ""),
-                        location.file(),
-                        location.line()
-                    );
+            let backtrace = backtrace::Backtrace::new();
+
+            match info.location() {
+                Some(location) => {
+                    // without backtrace
+                    if msg.starts_with("notrace - ") {
+                        error!(
+                            target: "panic", "thread '{}' panicked at '{}': {}:{}",
+                            thread,
+                            msg.replace("notrace - ", ""),
+                            location.file(),
+                            location.line()
+                        );
+                    }
+                    // with backtrace
+                    else {
+                        error!(
+                            target: "panic", "thread '{}' panicked at '{}': {}:{}\n{:?}",
+                            thread,
+                            msg,
+                            location.file(),
+                            location.line(),
+                            backtrace
+                        );
+                    }
                 }
-                // with backtrace
-                else {
-                    error!(
-                        target: "panic", "thread '{}' panicked at '{}': {}:{}\n{:?}",
-                        thread,
-                        msg,
-                        location.file(),
-                        location.line(),
-                        backtrace
-                    );
+                None => {
+                    // without backtrace
+                    if msg.starts_with("notrace - ") {
+                        error!(
+                            target: "panic", "thread '{}' panicked at '{}'",
+                            thread,
+                            msg.replace("notrace - ", ""),
+                        );
+                    }
+                    // with backtrace
+                    else {
+                        error!(
+                            target: "panic", "thread '{}' panicked at '{}'\n{:?}",
+                            thread,
+                            msg,
+                            backtrace
+                        );
+                    }
                 }
             }
-            None => {
-                // without backtrace
-                if msg.starts_with("notrace - ") {
-                    error!(
-                        target: "panic", "thread '{}' panicked at '{}'",
-                        thread,
-                        msg.replace("notrace - ", ""),
-                    );
-                }
-                // with backtrace
-                else {
-                    error!(
-                        target: "panic", "thread '{}' panicked at '{}'\n{:?}",
-                        thread,
-                        msg,
-                        backtrace
-                    );
-                }
-            }
-        }
-    }));
+        }));
+    }
 }

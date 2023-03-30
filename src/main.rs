@@ -1,18 +1,17 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use axum_sqlx_rest_api_with_jwt::{
-    config::AppConfig, database::Database, logger, server::ApplicationServer,
-};
 use clap::Parser;
 use dotenvy::dotenv;
 
 use tracing::info;
 
+use axum_sqlx_rest_api_with_jwt::{AppConfig, ApplicationServer, Database, Logger};
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
-    logger::init();
+    Logger::init();
 
     let config = Arc::new(AppConfig::parse());
 
