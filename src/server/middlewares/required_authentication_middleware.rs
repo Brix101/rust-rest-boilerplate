@@ -10,7 +10,7 @@ use crate::server::error::Error;
 use crate::server::services::Services;
 
 /// Extracts the JWT from the Authorization token header.
-pub struct RequiredAuthentication(pub Uuid);
+pub struct RequiredAuthentication(pub Uuid, pub Services);
 
 #[async_trait]
 impl<S> FromRequestParts<S> for RequiredAuthentication
@@ -58,7 +58,7 @@ where
                     Error::Unauthorized
                 })?;
 
-            Ok(RequiredAuthentication(user.id))
+            Ok(RequiredAuthentication(user.id, services))
         } else {
             Err(Error::Unauthorized)
         }
