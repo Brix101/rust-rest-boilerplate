@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
 use anyhow::Context;
+use axum_sqlx_rest_api_with_jwt::{
+    config::AppConfig, database::Database, logger, server::ApplicationServer,
+};
 use clap::Parser;
 use dotenvy::dotenv;
 
-use budgetto_api::{config::AppConfig, database::Database, server::ApplicationServer};
 use tracing::info;
-
-mod logger;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
