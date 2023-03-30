@@ -78,7 +78,7 @@ impl UsersServiceTrait for UsersService {
 
         if existing_user.is_some() {
             error!("user {:?} already exists", email);
-            return Err(Error::ObjectConflict(String::from("email is taken")));
+            return Err(Error::ObjectConflict(format!("email {} is taken", email)));
         }
 
         info!("creating password hash for user {:?}", email);
@@ -90,7 +90,7 @@ impl UsersServiceTrait for UsersService {
             .create_user(&email, &name, &hashed_password)
             .await?;
 
-        Ok(created_user.into_dto("".to_string()))
+        Ok(created_user.into_dto(String::new()))
     }
 
     async fn signin_user(

@@ -21,6 +21,7 @@ pub struct ResponseUserDto {
     pub id: Uuid,
     pub name: String,
     pub email: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub access_token: Option<String>,
 }
 
