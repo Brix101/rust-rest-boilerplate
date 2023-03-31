@@ -8,7 +8,7 @@ use crate::server::dtos::category_dto::{
     CategoryCreateDto, CategoryQuery, CategoryResponseDto, CategoryUpdateDto,
 };
 use crate::server::error::AppResult;
-use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
+use crate::server::extractors::{RequiredAuthentication, ValidationExtractor};
 
 pub struct CategoryController;
 
@@ -41,7 +41,7 @@ impl CategoryController {
 
     pub async fn create_category(
         RequiredAuthentication(user_id, services): RequiredAuthentication,
-        ValidatedRequest(request): ValidatedRequest<CategoryCreateDto>,
+        ValidationExtractor(request): ValidationExtractor<CategoryCreateDto>,
     ) -> AppResult<Json<CategoryResponseDto>> {
         info!("received request to create category");
 

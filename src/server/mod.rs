@@ -1,7 +1,7 @@
 mod api;
 pub mod dtos;
 pub mod error;
-pub mod middlewares;
+pub mod extractors;
 pub mod services;
 pub mod utils;
 

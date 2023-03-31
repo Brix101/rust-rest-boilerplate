@@ -10,10 +10,10 @@ use validator::Validate;
 use crate::server::error::Error;
 
 /// Validate User Request.
-pub struct ValidatedRequest<T>(pub T);
+pub struct ValidationExtractor<T>(pub T);
 
 #[async_trait]
-impl<T, S, B> FromRequest<S, B> for ValidatedRequest<T>
+impl<T, S, B> FromRequest<S, B> for ValidationExtractor<T>
 where
     T: DeserializeOwned + Validate,
     S: Send + Sync,
@@ -27,6 +27,6 @@ where
     async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
         let Json(value) = Json::<T>::from_request(req, state).await?;
         value.validate()?;
-        Ok(ValidatedRequest(value))
+        Ok(ValidationExtractor(value))
     }
 }
