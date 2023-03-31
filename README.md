@@ -1,2 +1,2 @@
-# Rust-Rest-Boilerplate
+# Rust Rest Boilerplate
 Rust Axum Sqlx Boilerplate

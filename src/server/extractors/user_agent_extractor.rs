@@ -6,10 +6,10 @@ use axum::http::request::Parts;
 use crate::server::error::Error;
 
 /// Extracts the JWT from the cookie token header.
-pub struct UserAgent(pub Option<String>);
+pub struct UserAgentExtractor(pub Option<String>);
 
 #[async_trait]
-impl<S> FromRequestParts<S> for UserAgent
+impl<S> FromRequestParts<S> for UserAgentExtractor
 where
     S: Send + Sync,
 {
@@ -18,7 +18,7 @@ where
         if let Some(authorization_header) = parts.headers.get(USER_AGENT) {
             let header_value = authorization_header.to_str().unwrap_or(&"");
 
-            Ok(UserAgent(Some(header_value.to_string())))
+            Ok(UserAgentExtractor(Some(header_value.to_string())))
         } else {
             Err(Error::Unauthorized)
         }
