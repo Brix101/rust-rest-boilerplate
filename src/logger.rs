@@ -3,6 +3,7 @@
 use std::{panic, thread};
 
 use tracing::{error, level_filters::LevelFilter};
+use tracing_appender::non_blocking::WorkerGuard;
 
 #[cfg(debug_assertions)]
 const MAX_LEVEL: LevelFilter = LevelFilter::DEBUG;
@@ -15,13 +16,11 @@ const MAX_LEVEL: LevelFilter = LevelFilter::DEBUG;
 pub struct Logger {}
 
 impl Logger {
-    pub fn init() {
-        let mut guards = Vec::new();
-        let file_appender = tracing_appender::rolling::daily("logs", "daily.log");
-        let (_non_blocking, guard) = tracing_appender::non_blocking(file_appender);
-        guards.push(guard);
+    pub fn init() -> WorkerGuard {
+        let file_appender = tracing_appender::rolling::hourly("logs", "daily.log");
+        let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
         tracing_subscriber::fmt()
-            // .with_writer(non_blocking)
+            .with_writer(non_blocking)
             .with_max_level(MAX_LEVEL)
             .init();
 
@@ -85,5 +84,6 @@ impl Logger {
                 }
             }
         }));
+        guard
     }
 }

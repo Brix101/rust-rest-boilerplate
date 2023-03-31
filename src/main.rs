@@ -11,7 +11,7 @@ use rest_api::{AppConfig, ApplicationServer, Database, Logger};
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
-    Logger::init();
+    let _guard = Logger::init();
 
     let config = Arc::new(AppConfig::parse());
 
