@@ -6,7 +6,7 @@ use dotenvy::dotenv;
 
 use tracing::info;
 
-use axum_sqlx_rest_api_with_jwt::{AppConfig, ApplicationServer, Database, Logger};
+use rest_api::{AppConfig, ApplicationServer, Database, Logger};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
