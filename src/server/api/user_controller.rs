@@ -4,7 +4,7 @@ use axum::{Extension, Router};
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use tracing::info;
 
-use crate::extractors::{UserAgent, UserAgentExtractor};
+use crate::extractors::{SessionExtractor, UserAgentExtractor};
 use crate::server::dtos::user_dto::{
     SignInUserDto, SignUpUserDto, UpdateUserDto, UserAuthenicationResponse,
 };
@@ -19,10 +19,10 @@ impl UserController {
         Router::new()
             .route("/signup", post(Self::signup_user_endpoint))
             .route("/signin", post(Self::signin_user_endpoint))
-            .route("/whoami", get(Self::get_current_user_endpoint))
-            .route("/", put(Self::update_user_endpoint))
-            .route("/refresh", get(Self::refresh_user_endpoint))
             .route("/signout", post(Self::signout_user_endpoint))
+            .route("/whoami", get(Self::get_current_user_endpoint))
+            .route("/refresh", get(Self::refresh_user_endpoint))
+            .route("/", put(Self::update_user_endpoint))
     }
 
     pub async fn signup_user_endpoint(
@@ -42,7 +42,7 @@ impl UserController {
     pub async fn signin_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<Services>,
-        UserAgent(user_agent): UserAgent,
+        UserAgentExtractor(user_agent): UserAgentExtractor,
         ValidationExtractor(request): ValidationExtractor<SignInUserDto>,
     ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
         info!(
@@ -81,7 +81,7 @@ impl UserController {
     pub async fn refresh_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<Services>,
-        UserAgentExtractor(session_id, refresh_token): UserAgentExtractor,
+        SessionExtractor(session_id, refresh_token): SessionExtractor,
     ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
         info!("recieved request to refresh access token {:?}", session_id);
 
@@ -95,7 +95,7 @@ impl UserController {
     pub async fn signout_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<Services>,
-        UserAgentExtractor(session_id, _refresh_token): UserAgentExtractor,
+        SessionExtractor(session_id, _refresh_token): SessionExtractor,
     ) -> AppResult<CookieJar> {
         info!("recieved request to signout session {:?}", session_id);
 

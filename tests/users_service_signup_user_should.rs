@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use budgetto_api::{
+use mockall::predicate::*;
+use rest_api::{
     database::user::{DynUsersRepository, User},
     mocks::UsersServiceTestFixture,
     server::{
@@ -12,7 +13,6 @@ use budgetto_api::{
         utils::{argon_utils::DynArgonUtil, jwt_utils::DynJwtUtil},
     },
 };
-use mockall::predicate::*;
 use uuid::uuid;
 
 #[tokio::test]
