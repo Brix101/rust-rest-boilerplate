@@ -4,13 +4,12 @@ use axum::{Extension, Router};
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use tracing::info;
 
+use crate::extractors::{UserAgent, UserAgentExtractor};
 use crate::server::dtos::user_dto::{
     SignInUserDto, SignUpUserDto, UpdateUserDto, UserAuthenicationResponse,
 };
 use crate::server::error::AppResult;
-use crate::server::middlewares::{
-    DeserializeSession, RequiredAuthentication, UserAgent, ValidatedRequest,
-};
+use crate::server::extractors::{RequiredAuthentication, ValidationExtractor};
 use crate::server::services::Services;
 
 pub struct UserController;
@@ -28,7 +27,7 @@ impl UserController {
 
     pub async fn signup_user_endpoint(
         Extension(services): Extension<Services>,
-        ValidatedRequest(request): ValidatedRequest<SignUpUserDto>,
+        ValidationExtractor(request): ValidationExtractor<SignUpUserDto>,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!(
             "recieved request to create user {:?}/{:?}",
@@ -44,7 +43,7 @@ impl UserController {
         jar: CookieJar,
         Extension(services): Extension<Services>,
         UserAgent(user_agent): UserAgent,
-        ValidatedRequest(request): ValidatedRequest<SignInUserDto>,
+        ValidationExtractor(request): ValidationExtractor<SignInUserDto>,
     ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
         info!(
             "recieved request to login user {:?}",
@@ -82,7 +81,7 @@ impl UserController {
     pub async fn refresh_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<Services>,
-        DeserializeSession(session_id, refresh_token): DeserializeSession,
+        UserAgentExtractor(session_id, refresh_token): UserAgentExtractor,
     ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
         info!("recieved request to refresh access token {:?}", session_id);
 
@@ -96,7 +95,7 @@ impl UserController {
     pub async fn signout_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<Services>,
-        DeserializeSession(session_id, _refresh_token): DeserializeSession,
+        UserAgentExtractor(session_id, _refresh_token): UserAgentExtractor,
     ) -> AppResult<CookieJar> {
         info!("recieved request to signout session {:?}", session_id);
 

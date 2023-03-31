@@ -11,10 +11,10 @@ use crate::server::error::Error;
 use crate::server::services::Services;
 
 /// Extracts the JWT from the cookie token header.
-pub struct DeserializeSession(pub Uuid, pub String);
+pub struct UserAgentExtractor(pub Uuid, pub String);
 
 #[async_trait]
-impl<S> FromRequestParts<S> for DeserializeSession
+impl<S> FromRequestParts<S> for UserAgentExtractor
 where
     S: Send + Sync,
 {
@@ -41,7 +41,7 @@ where
                     Error::Unauthorized
                 })?;
 
-            Ok(DeserializeSession(
+            Ok(UserAgentExtractor(
                 session_id,
                 refresh_token_value.to_string(),
             ))
