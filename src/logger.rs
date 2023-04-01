@@ -5,23 +5,30 @@ use std::{panic, thread};
 use tracing::{error, level_filters::LevelFilter};
 use tracing_appender::non_blocking::WorkerGuard;
 
-#[cfg(debug_assertions)]
-const MAX_LEVEL: LevelFilter = LevelFilter::DEBUG;
-
-// #[cfg(not(debug_assertions))]
-// const MAX_LEVEL: LevelFilter = LevelFilter::INFO;
+use crate::CargoEnv;
 
 /// Initialize logger (tracing and panic hook).
-///
 pub struct Logger {}
 
 impl Logger {
-    pub fn init() -> WorkerGuard {
-        let file_appender = tracing_appender::rolling::daily("logs", "daily.log");
-        let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
+    pub fn init(cargo_env: CargoEnv) -> WorkerGuard {
+        let file_logger = tracing_appender::rolling::daily("logs", "daily.log");
+        let console_logger = std::io::stdout();
+
+        // TODO update the log level filter for own use
+        let max_level = match cargo_env {
+            CargoEnv::Development => LevelFilter::DEBUG,
+            CargoEnv::Production => LevelFilter::DEBUG,
+        };
+
+        let (non_blocking, guard) = match cargo_env {
+            CargoEnv::Development => tracing_appender::non_blocking(console_logger),
+            CargoEnv::Production => tracing_appender::non_blocking(file_logger),
+        };
+
         tracing_subscriber::fmt()
             .with_writer(non_blocking)
-            .with_max_level(MAX_LEVEL)
+            .with_max_level(max_level)
             .init();
 
         // catch panic and log them using tracing instead of default output to StdErr
