@@ -11,9 +11,9 @@ use rest_api::{AppConfig, ApplicationServer, Database, Logger};
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
-    let _guard = Logger::init();
-
     let config = Arc::new(AppConfig::parse());
+
+    let _guard = Logger::init(config.cargo_env);
 
     info!("environment loaded and configuration parsed, initializing Postgres connection and running migrations...");
     let db = Database::connect(&config.database_url, config.run_migrations)
