@@ -1,5 +1,5 @@
-mod query;
+mod model;
 mod repository;
 
-pub use query::*;
+pub use model::*;
 pub use repository::*;

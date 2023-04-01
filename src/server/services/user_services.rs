@@ -6,7 +6,6 @@ use uuid::Uuid;
 use async_trait::async_trait;
 
 use crate::{
-    database::user::DynUsersRepository,
     server::{
         dtos::{
             session_dto::NewSessionDto,
@@ -15,6 +14,7 @@ use crate::{
         error::{AppResult, Error},
         utils::{argon_utils::DynArgonUtil, jwt_utils::DynJwtUtil},
     },
+    user::DynUsersRepository,
 };
 
 use super::session_services::DynSessionsService;

@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use tracing::info;
 
 use crate::{
-    database::category::repository::CategoryType,
+    database::category::CategoryType,
     server::{
         dtos::{
             category_dto::CategoryCreateDto,
