@@ -1,30 +1,65 @@
-// use std::str::FromStr;
-use std::sync::Arc;
-use std::time::SystemTime;
-// use std::time::SystemTime;
-
+use anyhow::Context;
 use async_trait::async_trait;
-use mockall::automock;
-use sqlx::types::time::OffsetDateTime;
-use sqlx::FromRow;
-use uuid::{uuid, Uuid};
+use sqlx::query_as;
+use uuid::Uuid;
 
-/// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
-pub type DynUsersRepository = Arc<dyn UsersRepository + Send + Sync>;
+use crate::database::Database;
 
-#[automock]
+use super::{User, UsersRepository};
+
 #[async_trait]
-pub trait UsersRepository {
+impl UsersRepository for Database {
     async fn create_user(
         &self,
         email: &str,
         name: &str,
         hash_password: &str,
-    ) -> anyhow::Result<User>;
+    ) -> anyhow::Result<User> {
+        query_as!(
+            User,
+            r#"
+        insert into users (created_at, updated_at, name, email, password)
+        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar)
+        returning *
+            "#,
+            name,
+            email,
+            hash_password
+        )
+        .fetch_one(&self.pool)
+        .await
+        .context("an unexpected error occured while creating the user")
+    }
 
-    async fn get_user_by_email(&self, email: &str) -> anyhow::Result<Option<User>>;
+    async fn get_user_by_email(&self, email: &str) -> anyhow::Result<Option<User>> {
+        query_as!(
+            User,
+            r#"
+        select *
+        from users
+        where email = $1::varchar
+            "#,
+            email,
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .context("unexpected error while querying for user by email")
+    }
 
-    async fn get_user_by_id(&self, id: Uuid) -> anyhow::Result<User>;
+    async fn get_user_by_id(&self, id: Uuid) -> anyhow::Result<User> {
+        query_as!(
+            User,
+            r#"
+        select *
+        from users
+        where id = $1
+            "#,
+            id,
+        )
+        .fetch_one(&self.pool)
+        .await
+        .context("user was not found")
+    }
 
     async fn update_user(
         &self,
@@ -32,28 +67,26 @@ pub trait UsersRepository {
         email: String,
         name: String,
         password: String,
-    ) -> anyhow::Result<User>;
-}
-
-#[derive(FromRow, Debug)]
-pub struct User {
-    pub id: Uuid,
-    pub name: String,
-    pub email: String,
-    pub password: String,
-    pub created_at: OffsetDateTime,
-    pub updated_at: OffsetDateTime,
-}
-
-impl Default for User {
-    fn default() -> Self {
-        User {
-            id: uuid!("f3f898aa-ffa3-4b58-91b0-612a1c801a5e"),
-            email: String::from("stub email"),
-            name: String::from("stub name"),
-            password: String::from("hashed password"),
-            created_at: OffsetDateTime::from(SystemTime::now()),
-            updated_at: OffsetDateTime::from(SystemTime::now()),
-        }
+    ) -> anyhow::Result<User> {
+        query_as!(
+            User,
+            r#"
+        update users
+        set
+            name = $1::varchar,
+            email = $2::varchar,
+            password = $3::varchar,
+            updated_at = current_timestamp
+        where id = $4
+        returning *
+            "#,
+            name,
+            email,
+            password,
+            id
+        )
+        .fetch_one(&self.pool)
+        .await
+        .context("could not update the user")
     }
 }

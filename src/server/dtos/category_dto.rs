@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::database::category::repository::{Category, CategoryType};
+use crate::category::{Category, CategoryType};
 
 impl Category {
     pub fn into_dto(self) -> CategoryResponseDto {

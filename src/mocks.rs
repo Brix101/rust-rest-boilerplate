@@ -1,4 +1,4 @@
-use crate::database::category::repository::MockCategoriesRepository;
+use crate::database::category::MockCategoriesRepository;
 use crate::database::user::MockUsersRepository;
 use crate::server::services::session_services::MockSessionsServiceTrait;
 use crate::server::utils::argon_utils::MockArgonUtil;

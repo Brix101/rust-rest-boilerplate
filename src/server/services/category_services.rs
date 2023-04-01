@@ -6,7 +6,7 @@ use uuid::Uuid;
 use async_trait::async_trait;
 
 use crate::{
-    database::category::repository::{Category, DynCategoriesRepository},
+    database::category::{Category, DynCategoriesRepository},
     server::{
         dtos::category_dto::{CategoryCreateDto, CategoryResponseDto, CategoryUpdateDto},
         error::{AppResult, Error},
