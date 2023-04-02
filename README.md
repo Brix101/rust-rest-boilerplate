@@ -1,2 +1,2 @@
-# Rust Rest Boilerplate
-Rust Axum Sqlx Boilerplate
+# Rust-Rest-Boilerplate
+A simple CRUD backend app using Axum, Sqlx, Validator & JWT

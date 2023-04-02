@@ -17,7 +17,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 9000:8080
 
 volumes:
   db:
